@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content%}
+<div class="col-12">
+    <h4 class="mt-3 p-2 text-dark">Descarga De Historico De Una Fecha</h4>
+    <div class="mt-3 m-3 form-control">
+        
+        <form  method="post">
+            {% csrf_token %}
+            <input class="form-control" type="date" name="ifecha" id="ifecha" required>
+            <button type="submit" class="btn btn-outline-success mt-3">
+                <span class="material-symbols-outlined">
+                    download
+                    </span>
+                Descargar Histrorico</button>
+        </form>
+    </div>
+</div>
+<script>
+    // Obtén la fecha actual en JavaScript
+    var currentDate = new Date();
+
+    // Ajusta el objeto Date al huso horario de Colombia (GMT-5)
+    currentDate.setUTCHours(currentDate.getUTCHours() - 5);
+
+    // Formatea la fecha en el formato deseado ('yyyy-mm-dd')
+    var formattedDate = currentDate.toISOString().slice(0, 10);
+    console.log(currentDate)
+    console.log(formattedDate)
+
+    // Asigna la fecha formateada al input
+    document.getElementById("ifecha").value = formattedDate;
+</script>
+{% endblock %}

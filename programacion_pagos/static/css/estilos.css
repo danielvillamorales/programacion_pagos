@@ -1,0 +1,49 @@
+#navegacion {
+    width: 10em;
+    /* Otros estilos de tu barra de navegación */
+}
+
+
+
+a {
+    text-decoration: none;
+    color: aliceblue;
+}
+
+
+
+table {
+    position: relative;
+    font-size: x-small;
+    align-items: center;
+}
+
+
+
+@media (min-width: 0px) and (max-width: 550px) { 
+
+    table {
+        position: relative;
+        font-size: 6px;
+        align-items: center;
+    }
+
+    #botontodos {
+        font-size: 7px;
+    }
+
+    li {
+        font-size: 8px;
+    };
+
+    #titulo {
+        font-size:9px;
+    }
+
+    #persona{
+        font-size: 8px;
+    }
+
+
+
+}

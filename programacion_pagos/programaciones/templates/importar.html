@@ -1,0 +1,46 @@
+
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-6">
+
+    <h3>Instrucciones</h3>
+
+    <ol class="list-group list-group-flush list-group-sm">
+        <li class="list-group-item list-group-item-sm">crear un archivo de excel</li>
+        <li class="list-group-item list-group-item-sm">la hoja se debe llamar: <b>pagos</b></li>
+        <li class="list-group-item list-group-item-sm">el archivo no debe contener titulos y debe ir en el siguiente orden:</li>
+        <li class="list-group-item list-group-item-sm">
+            <ul>
+                <li class="list-group-item list-group-item-sm">empresa (ka, dyjon, pulman, pendientes)</li>
+                <li class="list-group-item list-group-item-sm">fecha de emision (dd/mm/yyyy)</li>
+                <li class="list-group-item list-group-item-sm">fecha de vencimiento (dd/mm/yyyy)</li>
+                <li class="list-group-item list-group-item-sm">nit</li>
+                <li class="list-group-item list-group-item-sm">proveedor</li>
+                <li class="list-group-item list-group-item-sm">descripcion</li>
+                <li class="list-group-item list-group-item-sm">concepto</li>
+                <li class="list-group-item list-group-item-sm"> descuento</li>
+                <li class="list-group-item list-group-item-sm"> Valor (sin decimales ni puntos)</li>
+            </ul>
+        </li>
+    </ol>
+    <br>
+</div>
+<div class="col-6">
+    <hr>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="formFile" class="form-label">Seleccione el archivo</label>
+            <input class="form-control" id="excel_file" type="file" name="excel_file">
+        </div>
+        <button type="submit" class="btn btn-primary">Importar</button>
+        
+    </form>
+
+    <hr>
+    <a class="btn btn-danger mt-3" href="{% url 'borrar_pendientes' %}">Borrar Pagos Sin Aprobar</a>
+    <p>esta opcion borrara los pagos subidos del dia de hoy que esten pendientes por aprobar</p>
+    <hr>
+</div>
+
+{% endblock %}

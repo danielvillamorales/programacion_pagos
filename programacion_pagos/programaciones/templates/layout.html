@@ -1,0 +1,67 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programacion Compras</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,200,1,-25" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static  'css/estilos.css' %}?1">
+</head>
+<body>
+    <div class="d-flex">
+        <div class="bg-dark p-2" id="navegacion">
+            <h4 id="titulo" class="text-light p-2">Bienvenido</h4>
+            <p id="persona" class="text-light p-2">
+                <span class="material-symbols-outlined">person</span> {{user.first_name}} {{user.last_name}}</p>
+            <hr class="text-light">
+            <ul class="list-group p-2">
+                <li class="list-group-item bg-secondary text-light mt-1 ">
+                    <a href="{% url 'consulta'%}">
+                        <span class="material-symbols-outlined">
+                            search
+                        </span> 
+                        Consultar</a></li>
+                <li class="list-group-item bg-secondary text-light mt-1">
+                    <a href="{% url 'pendientes'%}">
+                        <span class="material-symbols-outlined">
+                            pending_actions
+                        </span>
+                        Pendientes</a>
+                </li>
+                <li class="list-group-item bg-secondary text-light mt-1">
+                    <a href="{% url 'historico'%}">
+                        <span class="material-symbols-outlined">
+                            history_edu
+                        </span>
+                        Historico de Pagos</a>
+                </li>
+                <li class="list-group-item bg-secondary text-light mt-1">
+                    <span class="material-symbols-outlined">
+                    <a href="{% url 'importar'%}">
+                        upgrade
+                    </span>
+                        Importar</a>
+                </li>
+            </ul>
+
+        </div>
+        <div class="row" id="contenido">
+            {% if messages %}
+            {% for message in messages %}
+            <ul >
+                <li {% if message.tags %} 
+                class="alert alert-{%if message.tags == 'error' %}danger{% else %}{{ message.tags }} {%endif%}  alert-dismissible fade show"{% endif %} role="alert">{{ message }} </li>
+            </ul>
+            {% endfor %}
+        {% endif %}
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+</body>
+</html>
