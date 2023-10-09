@@ -3,44 +3,50 @@
 {% load humanize %}
 <div class="col-12 mt-2">
             <h6 class="bg-success text-center">{{ pagos.0.fecha_pago }} -> {{ pagos.0.empresa | upper}}</h6>
-            <h6 class="bg-success text-end">TOTAL: {{ total| intcomma}}</h6>
+            <h6 class="bg-success text-center">{{ total| intcomma}}</h6>
             <table class="table table-sm">
                 <thead class="table-dark">
                     <tr>
                         <th>emision</th>
-                        <th>vencimiento</th>
+                        <th class="no-movil">vencimiento</th>
                         <th>nit</th>
-                        <th>proveedor</th>
+                        <th class="no-movil">proveedor</th>
                         <th>descripcion</th>
-                        <th>concepto</th>
+                        <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th> {% if pagos.0.empresa  == 'ka' %}<a href="{% url 'aprobar_todo'%}" id="botontodos" class="btn btn-sm btn-success">Aprobar Todo</a> {% endif %}</th>
+                        <th> {% if pagos.0.empresa  == 'ka' %}<a href="{% url 'aprobar_todo'%}" id="botontodos" class="btn btn-sm btn-success">Todos</a> {% endif %}</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
                     {% for pago in pagos %}
                             <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
-                                <td>{{ pago.emision }}</td>
-                                <td>{{ pago.vencimiento }}</td>
-                                <td>{{ pago.nit }}</td>
-                                <td>{{ pago.proveedor }}</td>
-                                <td>{{ pago.descripcion }}</td>
-                                <td>{{ pago.concepto }}</td>
+                                <td>{{ pago.emision }}
+                                    <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                                </td>
+                                <td class="no-movil">{{ pago.vencimiento }}</td>
+                                <td>{{ pago.nit }} <span class="movil">{{ pago.proveedor }}</span></td>
+                                <td class="no-movil">{{ pago.proveedor }} </td>
+                                <td>{{ pago.descripcion }} 
+                                    <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                                </td>
+                                <td class="no-movil">{{ pago.concepto }}
+                                </td>
                                 <td>{{ pago.descuento }}</td>
                                 <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
                                 <td>
                                     {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
                                     <a href="{% url 'aprobar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            done_outline
-                                        </span>
-                                    </a>
-                                    <a href="{% url 'rechazar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            cancel
+                                        <span class="material-symbols-outlined p-1">
+                                            check_circle
                                             </span>
                                     </a>
+                                    <a href="{% url 'rechazar' pago.id %}">
+                                        <span class="material-symbols-outlined p-1">
+                                            cancel
+                                        </span>
+                                    </a>
+                                    
                                     {% else %}
                                     {{pago.get_estado_display}}
                                     {% endif %}
@@ -51,99 +57,109 @@
             </table>
 
             <h6 class="bg-info text-center">{{ pagos_dyjon.0.fecha_pago }} -> {{ pagos_dyjon.0.empresa | upper}}</h6>
-            <h6 class="bg-info text-end">TOTAL: {{ total_dyjon| intcomma}}</h6>
+            <h6 class="bg-info text-center">{{ total_dyjon| intcomma}}</h6>
             <table class="container-fluid table table-sm">
                 <thead class="table-dark">
                     <tr>
                         <th>emision</th>
-                        <th>vencimiento</th>
+                        <th class="no-movil">vencimiento</th>
                         <th>nit</th>
-                        <th>proveedor</th>
+                        <th class="no-movil">proveedor</th>
                         <th>descripcion</th>
-                        <th>concepto</th>
+                        <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th>Acciones</th>
+                        <th> {% if pagos.0.empresa  == 'ka' %}<a href="{% url 'aprobar_todo'%}" id="botontodos" class="btn btn-sm btn-success">Todos</a> {% endif %}</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
                     {% for pago in pagos_dyjon %}
-                            <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
-                                <td>{{ pago.emision }}</td>
-                                <td>{{ pago.vencimiento }}</td>
-                                <td>{{ pago.nit }}</td>
-                                <td>{{ pago.proveedor }}</td>
-                                <td>{{ pago.descripcion }}</td>
-                                <td>{{ pago.concepto }}</td>
-                                <td>{{ pago.descuento }}</td>
-                                <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                                
-                                <td>
-                                    
-                                    {% if pago.estado == '0'  and pago.empresa != 'pendientes'%}
-                                    <a href="{% url 'aprobar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            done_outline
-                                        </span>
-                                    </a>
-                                    <a href="{% url 'rechazar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            cancel
-                                            </span>
-                                    </a>
-                                    {% else %}
-                                    {{pago.get_estado_display}}
-                                    {% endif %}
-                                </td>
-                            </tr>
+                    <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} <span class="movil">{{ pago.proveedor }}</span></td>
+                        <td class="no-movil">{{ pago.proveedor }} </td>
+                        <td>{{ pago.descripcion }} 
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1">
+                                    check_circle
+                                    </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1">
+                                    cancel
+                                </span>
+                            </a>
+                            
+                            {% else %}
+                            {{pago.get_estado_display}}
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
 
             <h6 class="bg-secondary text-white text-center">{{ pagos_pulman.0.fecha_pago }} -> {{ pagos_pulman.0.empresa | upper}}</h6>
-            <h6 class="bg-secondary text-white text-end">TOTAL: {{ total_pulman| intcomma}}</h6>
+            <h6 class="bg-secondary text-white text-center">{{ total_pulman| intcomma}}</h6>
             <table class="container-fluid table table-sm">
                 <thead class="table-dark">
                     <tr>
                         <th>emision</th>
-                        <th>vencimiento</th>
+                        <th class="no-movil">vencimiento</th>
                         <th>nit</th>
-                        <th>proveedor</th>
+                        <th class="no-movil">proveedor</th>
                         <th>descripcion</th>
-                        <th>concepto</th>
+                        <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th>Acciones</th>
+                        <th> {% if pagos.0.empresa  == 'ka' %}<a href="{% url 'aprobar_todo'%}" id="botontodos" class="btn btn-sm btn-success">Todos</a> {% endif %}</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
                     {% for pago in pagos_pulman %}
-                            <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
-                                <td>{{ pago.emision }}</td>
-                                <td>{{ pago.vencimiento }}</td>
-                                <td>{{ pago.nit }}</td>
-                                <td>{{ pago.proveedor }}</td>
-                                <td>{{ pago.descripcion }}</td>
-                                <td>{{ pago.concepto }}</td>
-                                <td>{{ pago.descuento }}</td>
-                                <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                                <td>
-                                    {% if pago.estado == '0'  and pago.empresa != 'pendientes' %}
-                                    <a href="{% url 'aprobar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            done_outline
-                                        </span>
-                                    </a>
-                                    <a href="{% url 'rechazar' pago.id %}">
-                                        <span class="material-symbols-outlined">
-                                            cancel
-                                            </span>
-                                    </a>
-                                    {% else %}
-                                    {{pago.get_estado_display}}
-                                    {% endif %}
-                                </td>
-                            </tr>
+                    <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} <span class="movil">{{ pago.proveedor }}</span></td>
+                        <td class="no-movil">{{ pago.proveedor }} </td>
+                        <td>{{ pago.descripcion }} 
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1">
+                                    check_circle
+                                    </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1">
+                                    cancel
+                                </span>
+                            </a>
+                            
+                            {% else %}
+                            {{pago.get_estado_display}}
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

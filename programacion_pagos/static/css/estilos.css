@@ -18,13 +18,25 @@ table {
     align-items: center;
 }
 
+.movil{
+    display: none;
+}
+
+.no-movil{
+    display:auto;
+}
 
 
-@media (min-width: 0px) and (max-width: 550px) { 
+@media (min-width: 0px) and (max-width: 700px) { 
+
+    #navegacion {
+        width: 6em;
+        /* Otros estilos de tu barra de navegación */
+    }
 
     table {
         position: relative;
-        font-size: 6px;
+        font-size: 5px;
         align-items: center;
     }
 
@@ -44,6 +56,30 @@ table {
         font-size: 8px;
     }
 
+    .movil{
+        display: block;
+    }
 
+    .no-movil{
+        display: none;
+    }
+
+    a {
+        text-decoration: none;
+        color: aliceblue;
+        font-size: 8px;
+    }
+
+    #titulo{
+        font-size: 12px;
+    }
+
+    .material-symbols-outlined{
+        font-size: 15px;
+    }
+
+    h6 {
+        font-size: 12px;
+    }
 
 }
