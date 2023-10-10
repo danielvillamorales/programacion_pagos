@@ -116,7 +116,7 @@ def aprobar_todo(request):
     return redirect('consulta')
 
 def pendientes(request):
-    pagos = Pagos.objects.filter(fecha_pago = date.today(), estado = '0', empresa = 'pendientes').order_by('-valor')
+    pagos = Pagos.objects.filter(fecha_pago = date.today(), estado = '0', empresa = 'pendientes').order_by('vencimiento','-valor')
     total = sum(pago.valor for pago in pagos)
     return render(request, 'consulta.html', {'pagos':pagos, 'total':total})
 
