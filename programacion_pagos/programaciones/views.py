@@ -12,7 +12,7 @@ from django.db.models import Q
 
 # Create your views here.
 ESTADO = {'0':'Pendiente', '1':'Aprobado Jefe', '9':'Rechazado'}
-EMPRESAS_PERMITIDAS = ["ka", "pendientes", "dyjon", "pulman"]
+EMPRESAS_PERMITIDAS = ["ka", "pendientes", "dyjon", "pulman","nomina"]
 
 def crearObjeto(**kwargs):
     pago = Pagos()
@@ -80,13 +80,18 @@ def importar(request):
 
 @login_required(login_url='login') 
 def consulta(request):
+    pagos_nomina = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'nomina').order_by('estado','-valor')
     pagos = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'ka').order_by('estado','-valor')
     pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'dyjon').order_by('estado','-valor')
     pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'pulman').order_by('estado','-valor')
     total = sum(pago.valor for pago in pagos)
     total_dyjon = sum(pago.valor for pago in pagos_dyjon)
     total_pulman = sum(pago.valor for pago in pagos_pulman)
-    return render(request, 'consulta.html', {'pagos':pagos, 'total':total, 'pagos_dyjon':pagos_dyjon, 'total_dyjon':total_dyjon, 'pagos_pulman':pagos_pulman, 'total_pulman':total_pulman })
+    total_nomina = sum(pago.valor for pago in pagos_nomina)
+    return render(request, 'consulta.html', {'pagos':pagos, 'total':total, 'pagos_dyjon':pagos_dyjon,
+                                             'pagos_nomina':pagos_nomina, 'total_nomina':total_nomina,
+                                              'total_dyjon':total_dyjon, 'pagos_pulman':pagos_pulman,
+                                                'total_pulman':total_pulman })
 
 
 def aprobar(request, id):
