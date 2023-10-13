@@ -134,6 +134,36 @@ def historico(request):
     return render(request, 'historico.html')
 
 
+def pagos_aprobados(request):
+    pagos = Pagos.objects.filter(fecha_pago = date.today(), 
+                                 empresa = 'ka',
+                                 estado = '1').order_by('empresa', '-valor')
+    pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), 
+                                 empresa = 'pulman',
+                                 estado = '1').order_by('empresa', '-valor')
+    pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), 
+                                 empresa = 'dyjon',
+                                 estado = '1').order_by('empresa', '-valor')
+
+    if request.method == 'POST':
+        fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
+        pagos = Pagos.objects.filter(fecha_pago = fecha, 
+                                 empresa = 'ka',
+                                 estado = '1').order_by('empresa', '-valor')
+        pagos_pulman = Pagos.objects.filter(fecha_pago = fecha, 
+                                 empresa = 'pulman',
+                                 estado = '1').order_by('empresa', '-valor')
+        pagos_dyjon = Pagos.objects.filter(fecha_pago = fecha, 
+                                 empresa = 'dyjon',
+                                 estado = '1').order_by('empresa', '-valor')
+    total = sum(pago.valor for pago in pagos)
+    total_pulman = sum(pago.valor for pago in pagos_pulman)
+    total_dyjon = sum(pago.valor for pago in pagos_dyjon)
+    return render(request, 'aprobados.html',{'pagos':pagos, 'total':total, 'pagos_pulman':pagos_pulman, 
+                                             'total_pulman':total_pulman, 'pagos_dyjon':pagos_dyjon, 
+                                             'total_dyjon':total_dyjon})
+
+
 def exportar_clientes(request):
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('pagos')

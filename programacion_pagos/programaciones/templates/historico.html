@@ -1,19 +1,21 @@
 {% extends "layout.html" %}
 {% block content%}
 <div class="col-12">
-    <h4 class="mt-3 p-2 text-dark">Descarga De Historico De Una Fecha</h4>
-    <div class="mt-3 m-3 form-control">
-        
-        <form  method="post">
-            {% csrf_token %}
-            <input class="form-control" type="date" name="ifecha" id="ifecha" required>
-            <button type="submit" class="btn btn-outline-success mt-3">
-                <span class="material-symbols-outlined">
-                    download
-                    </span>
-                Descargar Histrorico</button>
-        </form>
-    </div>
+    <div class="container-fluid">
+        <h4 class="mt-3 p-2 text-dark">Descarga De Historico De Una Fecha</h4>
+        <div class="mt-3 form-control">
+            
+            <form  method="post">
+                {% csrf_token %}
+                <input class="form-control" type="date" name="ifecha" id="ifecha" required>
+                <button type="submit" class="btn btn-outline-success mt-3">
+                    <span class="material-symbols-outlined">
+                        download
+                        </span>
+                    Descargar Histrorico</button>
+            </form>
+        </div>
+    </div>  
 </div>
 <script>
     // Obtén la fecha actual en JavaScript
