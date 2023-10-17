@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import openpyxl
 from .models import Pagos
 import xlwt
@@ -122,6 +122,12 @@ def aprobar_todo(request):
 
 def pendientes(request):
     pagos = Pagos.objects.filter(fecha_pago = date.today(), estado = '0', empresa = 'pendientes').order_by('vencimiento','-valor')
+    total = sum(pago.valor for pago in pagos)
+    return render(request, 'consulta.html', {'pagos':pagos, 'total':total})
+
+def pendientes_next(request):
+    pagos = Pagos.objects.filter(fecha_pago =date.today(), vencimiento = date.today() + timedelta(days=1), estado = '0',
+                                  empresa = 'pendientes').order_by('vencimiento','-valor')
     total = sum(pago.valor for pago in pagos)
     return render(request, 'consulta.html', {'pagos':pagos, 'total':total})
 
