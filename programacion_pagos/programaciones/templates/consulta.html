@@ -61,7 +61,11 @@
         {% endif %}
 
             <h6 class="text-secondary">Pagos {{ pagos.0.fecha_pago }}: {{ pagos.0.empresa | upper}}</h6>
-            <h6 class="text-secondary">$ {{ total| intcomma}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary" title="Total">$ {{ total|add:total_rechazados | intcomma}}</span>
+                <span class="text-success" title="Aprobado">$ {{ total| intcomma}}</span>  
+                <span class="text-danger" title="Rechazado"> $ {{total_rechazados | intcomma}}</span>
+            </h6>
             <hr>
             <table class="table table-sm">
                 <thead class="table-dark">
@@ -116,7 +120,10 @@
             </table>
 
             <h6 class="text-secondary">Pagos {{ pagos_dyjon.0.fecha_pago }}: {{ pagos_dyjon.0.empresa | upper}}</h6>
-            <h6 class="text-secondary">$ {{ total_dyjon| intcomma}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary">$ {{ total_dyjon|add:total_rechazados_dyjon | intcomma}}</span>
+                <span class="text-success">$ {{ total_dyjon| intcomma}}</span> 
+                <span class="text-danger"> $ {{total_rechazados_dyjon | intcomma}}</span></h6>
             <hr>
             <table class="container-fluid table table-sm">
                 <thead class="table-dark">
@@ -171,7 +178,9 @@
             </table>
 
             <h6 class="text-secondary">Pagos {{ pagos_pulman.0.fecha_pago }}: {{ pagos_pulman.0.empresa | upper}}</h6>
-            <h6 class="text-secondary">$ {{ total_pulman| intcomma}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-success">$ {{ total_pulman| intcomma}} </span>
+                <span class="text-danger"> $ {{total_rechazados_pulman | intcomma}}</span></h6>
             <hr>
             <table class="container-fluid table table-sm">
                 <thead class="table-dark">

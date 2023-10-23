@@ -84,14 +84,22 @@ def consulta(request):
     pagos = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'ka').order_by('estado','-valor')
     pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'dyjon').order_by('estado','-valor')
     pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'pulman').order_by('estado','-valor')
-    total = sum(pago.valor for pago in pagos)
-    total_dyjon = sum(pago.valor for pago in pagos_dyjon)
-    total_pulman = sum(pago.valor for pago in pagos_pulman)
+
+    pagos_rechazados = pagos.filter(estado = '9')
+    total_rechazados = sum(pago.valor for pago in pagos_rechazados)
+    total = sum(pago.valor for pago in pagos) - total_rechazados
+    pagos_rechazados_dyjon = pagos_dyjon.filter(estado = '9')
+    total_rechazados_dyjon = sum(pago.valor for pago in pagos_rechazados_dyjon)
+    total_dyjon = sum(pago.valor for pago in pagos_dyjon) - total_rechazados_dyjon
+    pagos_rechazados_pulman = pagos_pulman.filter(estado = '9') 
+    total_rechazados_pulman = sum(pago.valor for pago in pagos_rechazados_pulman)
+    total_pulman = sum(pago.valor for pago in pagos_pulman)  - total_rechazados_pulman
     total_nomina = sum(pago.valor for pago in pagos_nomina)
     return render(request, 'consulta.html', {'pagos':pagos, 'total':total, 'pagos_dyjon':pagos_dyjon,
                                              'pagos_nomina':pagos_nomina, 'total_nomina':total_nomina,
                                               'total_dyjon':total_dyjon, 'pagos_pulman':pagos_pulman,
-                                                'total_pulman':total_pulman })
+                                                'total_pulman':total_pulman, 'total_rechazados_dyjon':total_rechazados_dyjon, 
+                                                 'total_rechazados_pulman':total_rechazados_pulman, 'total_rechazados':total_rechazados })
 
 
 def aprobar(request, id):
@@ -123,13 +131,23 @@ def aprobar_todo(request):
 def pendientes(request):
     pagos = Pagos.objects.filter(fecha_pago = date.today(), estado = '0', empresa = 'pendientes').order_by('vencimiento','-valor')
     total = sum(pago.valor for pago in pagos)
-    return render(request, 'consulta.html', {'pagos':pagos, 'total':total})
+    total_rechazados_pulman = 0 
+    total_rechazados_dyjon = 0
+    total_rechazados = 0 
+    return render(request, 'consulta.html', {'pagos':pagos, 'total':total,
+                                             'total_rechazados_pulman':total_rechazados_pulman,
+                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
 
 def pendientes_next(request):
     pagos = Pagos.objects.filter(fecha_pago =date.today(), vencimiento = date.today() + timedelta(days=1), estado = '0',
                                   empresa = 'pendientes').order_by('vencimiento','-valor')
     total = sum(pago.valor for pago in pagos)
-    return render(request, 'consulta.html', {'pagos':pagos, 'total':total})
+    total_rechazados_pulman = 0 
+    total_rechazados_dyjon = 0
+    total_rechazados = 0 
+    return render(request, 'consulta.html', {'pagos':pagos, 'total':total, 
+                                             'total_rechazados_pulman':total_rechazados_pulman,
+                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
 
 def borrar_pendientes(request):
     if request.user.has_perm('programaciones.subir_excel'):
@@ -170,9 +188,13 @@ def pagos_aprobados(request):
     total = sum(pago.valor for pago in pagos)
     total_pulman = sum(pago.valor for pago in pagos_pulman)
     total_dyjon = sum(pago.valor for pago in pagos_dyjon)
+    total_rechazados_pulman = 0 
+    total_rechazados_dyjon = 0
+    total_rechazados = 0 
     return render(request, 'aprobados.html',{'pagos':pagos, 'total':total, 'pagos_pulman':pagos_pulman, 
                                              'total_pulman':total_pulman, 'pagos_dyjon':pagos_dyjon, 
-                                             'total_dyjon':total_dyjon})
+                                             'total_dyjon':total_dyjon, 'total_rechazados_pulman':total_rechazados_pulman,
+                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
 
 
 def exportar_clientes(request):
