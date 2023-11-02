@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth.views import LoginView,LogoutView
-from programaciones.views import importar, consulta, aprobar, rechazar, aprobar_todo, pendientes, borrar_pendientes, historico, pagos_aprobados,pendientes_next
+from programaciones.views import importar, consulta, aprobar, rechazar, aprobar_todo, pendientes, borrar_pendientes, historico, pagos_aprobados,pendientes_next,agregar_cuenta,inactivar_cuenta,cuentas
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +32,8 @@ urlpatterns = [
     path('borrar_pendientes/',borrar_pendientes,name="borrar_pendientes"),
     path('historico/',historico,name="historico"),
     path('pagos_aprobados/',pagos_aprobados,name="pagos_aprobados"),
-    path('pendientes_next', pendientes_next, name="pendientes_next")
-    
+    path('pendientes_next', pendientes_next, name="pendientes_next"),
+    path('agregar_cuenta', agregar_cuenta, name="agregar_cuenta"),
+    path('cuentas', cuentas, name="cuentas"),
+    path('inactivar_cuenta/<int:id>', inactivar_cuenta, name="inactivar_cuenta"),
 ]

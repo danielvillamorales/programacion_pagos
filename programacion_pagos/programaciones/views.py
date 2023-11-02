@@ -2,13 +2,15 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from datetime import datetime, date, timedelta
 import openpyxl
-from .models import Pagos
+from .models import Pagos, CuentasBancarias,ProgramacionPagosAprobados
 import xlwt
 from django.http import HttpResponse
 from io import BytesIO
 from django.contrib.auth.decorators import login_required
-from django.db.models import F
 from django.db.models import Q
+from django.db.models import F, Value, Case, When, CharField, Value
+from django.db.models.functions import Concat
+from django.db.models import Subquery, OuterRef
 
 # Create your views here.
 ESTADO = {'0':'Pendiente', '1':'Aprobado Jefe', '9':'Rechazado'}
@@ -164,27 +166,28 @@ def historico(request):
 
 
 def pagos_aprobados(request):
-    pagos = Pagos.objects.filter(fecha_pago = date.today(), 
-                                 empresa = 'ka',
-                                 estado = '1').order_by('empresa', '-valor')
-    pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), 
-                                 empresa = 'pulman',
-                                 estado = '1').order_by('empresa', '-valor')
-    pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), 
-                                 empresa = 'dyjon',
-                                 estado = '1').order_by('empresa', '-valor')
-
+    fecha = date.today()
     if request.method == 'POST':
         fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
-        pagos = Pagos.objects.filter(fecha_pago = fecha, 
+    pagos = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
                                  empresa = 'ka',
                                  estado = '1').order_by('empresa', '-valor')
-        pagos_pulman = Pagos.objects.filter(fecha_pago = fecha, 
+    pagos_pulman = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
                                  empresa = 'pulman',
                                  estado = '1').order_by('empresa', '-valor')
-        pagos_dyjon = Pagos.objects.filter(fecha_pago = fecha, 
+    pagos_dyjon = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
                                  empresa = 'dyjon',
                                  estado = '1').order_by('empresa', '-valor')
+    for pago in pagos:
+        pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
+        
+
+    for pago in pagos_pulman:
+        pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
+
+    for pago in pagos_dyjon:
+        pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
+
     total = sum(pago.valor for pago in pagos)
     total_pulman = sum(pago.valor for pago in pagos_pulman)
     total_dyjon = sum(pago.valor for pago in pagos_dyjon)
@@ -204,7 +207,7 @@ def exportar_clientes(request):
     font_style = xlwt.XFStyle()
     font_style.font.bold = True
 
-    columns = ['fecha_pago', 'empresa', 'emision', 'vencimiento', 'nit', 'proveedor','descripcion','concepto','descuento','valor','estado_descripcion']
+    columns = ['fecha_pago', 'empresa', 'emision', 'vencimiento', 'nit', 'proveedor','descripcion','concepto','descuento','valor','estado_descripcion','cuentas']
 
     for col_num in range(len(columns)):
         ws.write(row_num, col_num, columns[col_num], font_style)
@@ -212,7 +215,7 @@ def exportar_clientes(request):
     font_style = xlwt.XFStyle()
 
     fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
-    rows = Pagos.objects.filter(fecha_pago = fecha, estado__in=['1','9']).values_list('fecha_pago', 'empresa', 'emision', 'vencimiento', 'nit', 'proveedor','descripcion','concepto','descuento','valor','estado').order_by('empresa', 'estado')
+    rows = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, estado__in=['1','9']).values_list('fecha_pago', 'empresa', 'emision', 'vencimiento', 'nit', 'proveedor','descripcion','concepto','descuento','valor','estado','cuentas_concatenadas').order_by('empresa', 'estado')
 
 
     # Procesar los datos y escribir en el archivo
@@ -222,7 +225,7 @@ def exportar_clientes(request):
                 formatted_date = value.strftime('%Y-%m-%d')
                 ws.write(row_num, col_num, formatted_date, font_style)
             else:
-                ws.write(row_num, col_num, value if col_num!=10 else ESTADO.get(value) , font_style)
+                ws.write(row_num, col_num, value if col_num!=10 else ESTADO.get(value) , font_style) 
 
 
 
@@ -239,3 +242,38 @@ def exportar_clientes(request):
     response.write(output.getvalue())
     
     return response
+
+def agregar_cuenta(request):
+    if request.method == 'POST':
+        if request.user.has_perm('programaciones.add_cuentasbancarias'):
+            nit = request.POST.get('nit')
+            proveedor = request.POST.get('proveedor').upper()
+            banco = request.POST.get('banco').upper()
+            tipo_cuenta = request.POST.get('tipo_cuenta')
+            numero_cuenta = request.POST.get('numero_cuenta')
+            cuenta = CuentasBancarias(nit=nit, proveedor=proveedor, banco=banco, tipo_cuenta=tipo_cuenta, numero_cuenta=numero_cuenta)
+            cuenta.save()
+            messages.success(request, 'Cuenta agregada correctamente')
+        else:
+            messages.warning(request, 'No tiene permisos para agregar cuentas')
+    return render(request, 'agregar_cuenta.html')
+
+
+def cuentas(request):
+    if request.method== 'POST':
+        buscar = request.POST.get('buscar').upper()
+        cuentas = CuentasBancarias.objects.filter(Q(nit=buscar) | Q(proveedor__icontains = buscar))
+    else:
+        cuentas = CuentasBancarias.objects.all()
+    return render(request, 'cuentas.html', {'cuentas':cuentas})
+
+def inactivar_cuenta(request, id):
+    if request.user.has_perm('programaciones.add_cuentasbancarias'):
+        cuenta = CuentasBancarias.objects.get(id=id)
+        cuenta.estado = '1'
+        cuenta.save()
+        messages.success(request, 'Cuenta inactivada correctamente')
+    else:
+        messages.warning(request, 'No tiene permisos para inactivar cuentas')
+    return redirect('cuentas')
+

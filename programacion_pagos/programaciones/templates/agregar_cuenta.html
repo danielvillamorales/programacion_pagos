@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+
+<div class="col-12">
+    <h3 class="text-secondary">Agregar Cuentas</h3>
+    <hr>
+    <div class="container-fluid">
+        <form method="post">
+            {% csrf_token %}
+            <input type="number" class="form-control m-1" name="nit" id="nit" placeholder="Nit" required>
+            <input type="text" class="form-control m-1" name="proveedor" id="proveedor" placeholder="Nombre" required>
+            <input type="text" class="form-control m-1" name="banco" id="banco" placeholder="Banco" required>
+            <select name="tipo_cuenta" id="tipo_cuenta" class="form-control m-1">
+                <option value="a">Ahorros</option>
+                <option value="c">Corriente</option>
+                <option value="o">Otra</option>
+            </select>
+            <input type="number" class="form-control m-1" name="numero_cuenta" id="numero_cuenta" placeholder="Numero de cuenta" required>
+            <button class="btn btn-primary m-1" type="submit">Agregar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -36,7 +36,7 @@
                         <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th> {% if pagos.0.empresa  == 'ka' %}<a href="{% url 'aprobar_todo'%}" id="botontodos" class="btn btn-sm btn-success">Todos</a> {% endif %}</th>
+                        <th>Cuentas</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
@@ -56,21 +56,7 @@
                                 <td>{{ pago.descuento }}</td>
                                 <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
                                 <td>
-                                    {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                                    <a href="{% url 'aprobar' pago.id %}">
-                                        <span class="material-symbols-outlined p-1">
-                                            check_circle
-                                            </span>
-                                    </a>
-                                    <a href="{% url 'rechazar' pago.id %}">
-                                        <span class="material-symbols-outlined p-1">
-                                            cancel
-                                        </span>
-                                    </a>
-                                    
-                                    {% else %}
-                                    {{pago.get_estado_display}}
-                                    {% endif %}
+                                    <tr>{{pago.cuentas_concatenadas |safe}}</tr>
                                 </td>
                             </tr>
                     {% endfor %}
@@ -91,7 +77,7 @@
                         <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th>...</th>
+                        <th>Cuentas</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
@@ -111,21 +97,7 @@
                                 <td>{{ pago.descuento }}</td>
                                 <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
                                 <td>
-                                    {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                                    <a href="{% url 'aprobar' pago.id %}">
-                                        <span class="material-symbols-outlined p-1">
-                                            check_circle
-                                            </span>
-                                    </a>
-                                    <a href="{% url 'rechazar' pago.id %}">
-                                        <span class="material-symbols-outlined p-1">
-                                            cancel
-                                        </span>
-                                    </a>
-                                    
-                                    {% else %}
-                                    {{pago.get_estado_display}}
-                                    {% endif %}
+                                    {{pago.cuentas_concatenadas |safe}}
                                 </td>
                             </tr>
                     {% endfor %}
@@ -146,7 +118,7 @@
                         <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th>...</th>
+                        <th>Cuentas</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
@@ -166,21 +138,7 @@
                         <td>{{ pago.descuento }}</td>
                         <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
                         <td>
-                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                            <a href="{% url 'aprobar' pago.id %}">
-                                <span class="material-symbols-outlined p-1">
-                                    check_circle
-                                    </span>
-                            </a>
-                            <a href="{% url 'rechazar' pago.id %}">
-                                <span class="material-symbols-outlined p-1">
-                                    cancel
-                                </span>
-                            </a>
-                            
-                            {% else %}
-                            {{pago.get_estado_display}}
-                            {% endif %}
+                            {{pago.cuentas_concatenadas |safe}}
                         </td>
                     </tr>
                     {% endfor %}
@@ -201,7 +159,7 @@
                         <th class="no-movil">concepto</th>
                         <th>descuento</th>
                         <th>valor</th>
-                        <th>...</th>
+                        <th>Cuentas</th>
                     </tr>
                 </thead>
                 <tbody class="table table-sm">
@@ -221,21 +179,7 @@
                         <td>{{ pago.descuento }}</td>
                         <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
                         <td>
-                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                            <a href="{% url 'aprobar' pago.id %}">
-                                <span class="material-symbols-outlined p-1">
-                                    check_circle
-                                    </span>
-                            </a>
-                            <a href="{% url 'rechazar' pago.id %}">
-                                <span class="material-symbols-outlined p-1">
-                                    cancel
-                                </span>
-                            </a>
-                            
-                            {% else %}
-                            {{pago.get_estado_display}}
-                            {% endif %}
+                            {{pago.cuentas_concatenadas | safe}}
                         </td>
                     </tr>
                     {% endfor %}
