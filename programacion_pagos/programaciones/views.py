@@ -247,11 +247,12 @@ def agregar_cuenta(request):
     if request.method == 'POST':
         if request.user.has_perm('programaciones.add_cuentasbancarias'):
             nit = request.POST.get('nit')
+            digito_verificaicon = request.POST.get('digito_verificacion')
             proveedor = request.POST.get('proveedor').upper()
             banco = request.POST.get('banco').upper()
             tipo_cuenta = request.POST.get('tipo_cuenta')
             numero_cuenta = request.POST.get('numero_cuenta')
-            cuenta = CuentasBancarias(nit=nit, proveedor=proveedor, banco=banco, tipo_cuenta=tipo_cuenta, numero_cuenta=numero_cuenta)
+            cuenta = CuentasBancarias(nit=nit, proveedor=proveedor, banco=banco, tipo_cuenta=tipo_cuenta, numero_cuenta=numero_cuenta, digito_verificacion=digito_verificaicon)
             cuenta.save()
             messages.success(request, 'Cuenta agregada correctamente')
         else:

@@ -28,7 +28,7 @@
             <tbody>
                 {% for cuenta in cuentas %}
                 <tr>
-                    <td>{{ cuenta.nit }}</td>
+                    <td>{{ cuenta.nit }} - {{cuenta.digito_verificacion}}</td>
                     <td>{{ cuenta.proveedor }}</td>
                     <td>{{ cuenta.banco }}</td>
                     <td>{{ cuenta.get_tipo_cuenta_display}}</td>

@@ -44,6 +44,7 @@ class Pagos(models.Model):
 
 class CuentasBancarias(models.Model):
     nit = models.CharField(max_length=20)
+    digito_verificacion = models.CharField(max_length=1, blank=True, null=True)
     proveedor = models.CharField(max_length=200)
     banco = models.CharField(max_length=100)
     tipo_cuenta = models.CharField(max_length=1, choices=TIPO_CUENTA, default='a')
