@@ -13,88 +13,65 @@
 </head>
 <body>
     <div class="row">
-        <div class="col-2">
-            <div class="bg-dark" id="navegacion">
-                <h6 id="titulo" class="text-light mt-1 no-movil">Bienvenido</h6>
-                <p id="persona" class="text-light mt-1">
-                    <span class="material-symbols-outlined">person</span> {{user.first_name}} {{user.last_name}}</p>
-                <hr class="text-light">
-                <ul class="list-group text-center" #ul>
-                    <li class="li">
-                        <a href="{% url 'consulta'%}" title="consulta">
-                            <span class="material-symbols-outlined">
-                                search
-                            </span>
-                            <p class="text-secondary">
-                                Consulta
-                            </p> 
-                        </a>
-                    </li>
-                    <li class="li">
-                        <a href="{% url 'pendientes_next'%}" title="Pendientes Mañana">
-                            <span class="material-symbols-outlined">
-                                    schedule
-                            </span>
-                            <p class="text-secondary">
-                                Pnd Mañana
-                            </p> 
-                        </a>
-                    </li>
-                    <li class="li">
-                        <a href="{% url 'pendientes'%}" title="pendientes">
-                            <span class="material-symbols-outlined">
-                                pending_actions
-                            </span>
-                            <p class="text-secondary">
-                                Pendientes
-                            </p> 
-                        </a>
-                    </li>
-                    <li class="li">
-                        
-                        <a href="{% url 'pagos_aprobados'%}" title="aprobados">
-                        <span class="material-symbols-outlined active">
-                            search_check
-                        </span>
-                        <p class="text-secondary">
-                            Aprobados
-                        </p> 
-                        </a>
-                    </li>
-                    <li class="li">
-                        <a href="{% url 'historico'%}" title="Historico">
-                            <span class="material-symbols-outlined">
-                                history_edu
-                            </span>
-                            <p class="text-secondary">
-                                Historico
-                            </p> 
-                        </a>
-                    </li>
-                    <li class="li">    
-                        <a href="{% url 'importar'%}" title="importar">
-                            <span class="material-symbols-outlined">
-                                upgrade
-                            </span>
-                            <p class="text-secondary">
-                                Importar
-                            </p> 
-                        </a>
-                    </li>
-                    <li class="li">    
-                        <a href="{% url 'cuentas'%}" title="cuentas">
-                            <span class="material-symbols-outlined">
-                                account_balance
+        <div class="col-12">
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark fs-6" id="navegacion">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#">
+                        <span class="material-symbols-outlined">person</span> {{user.first_name}} {{user.last_name}}
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                        <div class="navbar-nav">
+                            <a class="nav-link" href="{% url 'consulta'%}" title="consulta">
+                                <span class="material-symbols-outlined">
+                                    search
                                 </span>
-                            <p class="text-secondary">
-                                Cuentas
-                            </p> 
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                                    Consulta
+                            </a>
+                            <a class="nav-link" href="{% url 'pendientes_next'%}" title="Pendientes Mañana">
+                                <span class="material-symbols-outlined">
+                                        schedule
+                                </span>
+                                    Pnd Mañana
+                            </a>
+                            <a class="nav-link" href="{% url 'pendientes'%}" title="pendientes">
+                                <span class="material-symbols-outlined">
+                                    pending_actions
+                                </span>
+                                    Pendientes
+                            </a>
+
+                            <a class="nav-link" href="{% url 'pagos_aprobados'%}" title="aprobados">
+                                <span class="material-symbols-outlined active">
+                                    search_check
+                                </span>
+                                    Aprobados
+                            </a>
+                            <a class="nav-link" href="{% url 'historico'%}" title="Historico">
+                                <span class="material-symbols-outlined">
+                                    history_edu
+                                </span>
+                                    Historico
+                            </a>   
+                            <a class="nav-link" href="{% url 'importar'%}" title="importar">
+                                <span class="material-symbols-outlined">
+                                    upgrade
+                                </span>
+                                    Importar
+                            </a>   
+                            <a class="nav-link" href="{% url 'cuentas'%}" title="cuentas">
+                                <span class="material-symbols-outlined">
+                                    account_balance
+                                </span>
+                                Cuentas 
+                            </a>
+                    </div>
+                </div>
+            </nav>
         </div>
-        <div class="col-10">
+        <div class="col-12">
             <div class="row" id="contenido">
                 {% if messages %}
                 {% for message in messages %}
