@@ -34,6 +34,8 @@ class Pagos(models.Model):
     valor = models.IntegerField(default=0)
     estado = models.CharField(max_length=2 , choices=ESTADOS, default='0')
 
+    def __str__(self) -> str:
+        return f'{self.id} {self.nit} - {self.proveedor} - {self.descripcion} - {self.concepto} - {self.valor}'
 
     class Meta:
         permissions = [('subir_excel', 'subir_excel'),
