@@ -98,7 +98,7 @@
             <h6 class="text-secondary">Pagos {{ pagos_dyjon.0.fecha_pago }}: {{ pagos_dyjon.0.empresa | upper}}</h6>
             <h6 class="text-secondary">$ {{ total_dyjon| intcomma}}</h6>
             <hr>
-            <table class="container-fluid table table-sm">
+            <table class="table">
                 <thead class="table-dark">
                     <tr>
                         <th>emision</th>
@@ -110,7 +110,7 @@
                         <th>Cuentas</th>
                     </tr>
                 </thead>
-                <tbody class="table table-sm">
+                <tbody class="table">
                     {% for pago in pagos_dyjon %}
                     <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
                         <td>{{ pago.emision }}
@@ -135,7 +135,7 @@
             <h6 class="text-secondary">Pagos {{ pagos_pulman.0.fecha_pago }}: {{ pagos_pulman.0.empresa | upper}}</h6>
             <h6 class="text-secondary">$ {{ total_pulman| intcomma}}</h6>
             <hr>
-            <table class="container-fluid table table-sm">
+            <table class="table">
                 <thead class="table-dark">
                     <tr>
                         <th>emision</th>
@@ -147,7 +147,7 @@
                         <th>Cuentas</th>
                     </tr>
                 </thead>
-                <tbody class="table table-sm">
+                <tbody class="table">
                     {% for pago in pagos_pulman %}
                     <tr class="{% if pago.estado == '0' %} table-danger {%endif%}">
                         <td>{{ pago.emision }}
