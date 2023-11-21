@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+<h6 class="text-secondary">Pagos {{ pagos.0.fecha_pago }}: {{ pagos.0.empresa | upper}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary" title="Total">$ {{ total | intcomma}}</span>
+            </h6>
+            <div class="row text-center">
+            {% for p in pagos_por_mes %}
+                <div class="col-6 col-sm-3 mt-1">
+                <button type="button" class="btn btn-sm btn-primary">
+                    {{p.vencimiento__year}} - {{p.vencimiento__month}}: <span class="badge text-bg-secondary">{{p.total | intcomma}}</span>
+                </button>
+                </div>
+            {% endfor %}
+            </div>
+            <hr>
+            <div class="container-fluid">
+            <table class="table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>vencimiento</th>
+                        <th>proveedor</th>
+                        <th>descripcion</th>
+                        <th class="no-movil">concepto</th>
+                        <th>descuento</th>
+                        <th>valor</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-sm">
+                    {% for pago in pagos %}
+                    <tr class=" table-warning">
+                        <td>{{ pago.vencimiento }}</td>
+                        <td>{{ pago.proveedor }}</td>
+                        <td>{{ pago.descripcion }} 
+                            <p class="movil">: {{ pago.concepto }}</p>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+{% endblock %}

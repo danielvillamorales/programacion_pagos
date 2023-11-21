@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.db.models import F, Value, Case, When, CharField, Value
 from django.db.models.functions import Concat
 from django.db.models import Subquery, OuterRef
+from django.db.models import Sum
 
 # Create your views here.
 ESTADO = {'0':'Pendiente', '1':'Aprobado Jefe', '9':'Rechazado'}
@@ -133,12 +134,16 @@ def aprobar_todo(request):
 def pendientes(request):
     pagos = Pagos.objects.filter(fecha_pago = date.today(), estado = '0', empresa = 'pendientes').order_by('vencimiento','-valor')
     total = sum(pago.valor for pago in pagos)
-    total_rechazados_pulman = 0 
-    total_rechazados_dyjon = 0
-    total_rechazados = 0 
-    return render(request, 'consulta.html', {'pagos':pagos, 'total':total,
-                                             'total_rechazados_pulman':total_rechazados_pulman,
-                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
+    # Consulta para obtener el monto total de los pagos por mes
+    pagos_por_mes = Pagos.objects.filter(fecha_pago = date.today(), 
+                                         estado = '0', 
+                                         empresa = 'pendientes'
+                                         ).values('vencimiento__month', 'vencimiento__year'
+                                                  ).annotate(total=Sum('valor')
+                                                             ).order_by('vencimiento__year', 'vencimiento__month')
+    print(pagos_por_mes)
+    return render(request, 'pendientes.html', {'pagos':pagos, 'total':total,
+                                             'pagos_por_mes':pagos_por_mes })
 
 def pendientes_next(request):
     pagos = Pagos.objects.filter(fecha_pago =date.today(), vencimiento = date.today() + timedelta(days=1), estado = '0',
@@ -147,6 +152,7 @@ def pendientes_next(request):
     total_rechazados_pulman = 0 
     total_rechazados_dyjon = 0
     total_rechazados = 0 
+    
     return render(request, 'consulta.html', {'pagos':pagos, 'total':total, 
                                              'total_rechazados_pulman':total_rechazados_pulman,
                                              'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
