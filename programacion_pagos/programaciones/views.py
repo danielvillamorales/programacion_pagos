@@ -83,10 +83,10 @@ def importar(request):
 
 @login_required(login_url='login') 
 def consulta(request):
-    pagos_nomina = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'nomina').order_by('estado','-valor')
-    pagos = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'ka').order_by('estado','-valor')
-    pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'dyjon').order_by('estado','-valor')
-    pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'pulman').order_by('estado','-valor')
+    pagos_nomina = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'nomina').order_by('estado','vencimiento','-valor')
+    pagos = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'ka').order_by('estado','vencimiento','-valor')
+    pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'dyjon').order_by('estado','vencimiento','-valor')
+    pagos_pulman = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'pulman').order_by('estado','vencimiento','-valor')
 
     pagos_rechazados = pagos.filter(estado = '9')
     total_rechazados = sum(pago.valor for pago in pagos_rechazados)
