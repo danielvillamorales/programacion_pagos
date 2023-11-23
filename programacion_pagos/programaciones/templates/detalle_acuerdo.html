@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+<div class="col-12">
+    <div class="p-2">
+    <h6 class="text-secondary">Acuerdo de pago {{cuotas.0.nombre_dia}} {{cuotas.0.dia}}/{{cuotas.0.mes}}/{{cuotas.0.año}}</h6>
+    <a href="{% url 'totales_mes' anio=cuotas.0.año mes=cuotas.0.mes%}" class="btn btn-sm btn-primary">volver</a>
+    </div>
+    <div class="container-fluid">
+    <table class="table table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>dia</th>
+                <th>proveedor</th>
+                <th>valor</th>
+                <th>observaciones</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cuota in cuotas %}
+            <tr>
+                <td>{{cuota.dia}}: {{ cuota.nombre_dia }}</td>
+                <td>{{ cuota.proovedoor }}</td>
+                <td>{{ cuota.cuota | intcomma}} 
+                </td>
+                <td>{{ cuota.observaciones }}
+                </td>
+                <td>
+                    {% if cuota.estado == '0'  %}
+                    <a href="{% url 'aprobar_acuerdo' cuota.id %}" class="bg-primary"><span class="p-3 text-white"><b>Aprobar</b></span></a>
+                    {% else %}
+                    ok
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </div>
+</div>
+{% endblock %}

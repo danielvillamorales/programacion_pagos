@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+<div class="col-12">
+    <div class="p-2">
+    <h6 class="text-secondary">Acuerdo de pago </h6>
+    <h6 class="text-secondary d-flex justify-content-between">
+        <span class="text-danger" title="Total">Pendiente $ {{ total_pendientes.total | intcomma}}</span>
+        <span class="text-primary" title="Total">Pagado $ {{ total_aprobados.total | intcomma}}</span>
+    </h6>
+    </div>
+</div>
+<div class="row mt-2">
+{% for cuota in cuotas %}
+<div class="col-sm-3 col-6 mt-1">
+    <div class="card p-1" >
+        <div class="card-header">
+        Cuota {{cuota.año}} - {{cuota.mes}}
+        </div>
+        <div class="card-body">
+            <h6 class="card-title text-center text-primary">
+                Valor a Pagar: {{cuota.total | intcomma}}
+            </h6>
+            <h6 class="card-title text-center text-danger">
+                Pendiente: {{cuota.pendiente | intcomma}}
+            </h6>
+            <a href="{% url 'totales_mes' anio=cuota.año mes=cuota.mes %}" class="btn btn-sm btn-primary card-link text-center">Ver Ditribucion</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

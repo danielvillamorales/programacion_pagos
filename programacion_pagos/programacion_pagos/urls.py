@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth.views import LoginView,LogoutView
-from programaciones.views import importar, consulta, aprobar, rechazar, aprobar_todo, pendientes, borrar_pendientes, historico, pagos_aprobados,pendientes_next,agregar_cuenta,inactivar_cuenta,cuentas
+from programaciones.views import importar, consulta,aprobar_acuerdo, aprobar,totales_ano,totales_mes,detalle_acuerdo, rechazar, aprobar_todo, pendientes, borrar_pendientes, historico, pagos_aprobados,pendientes_next,agregar_cuenta,inactivar_cuenta,cuentas
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +36,8 @@ urlpatterns = [
     path('agregar_cuenta', agregar_cuenta, name="agregar_cuenta"),
     path('cuentas', cuentas, name="cuentas"),
     path('inactivar_cuenta/<int:id>', inactivar_cuenta, name="inactivar_cuenta"),
+    path('totales_ano/', totales_ano, name="totales_ano"),
+    path('totales_mes/<int:anio>/<int:mes>/', totales_mes, name="totales_mes"),
+    path('detalle_acuerdo/<int:anio>/<int:mes>/<int:dia>', detalle_acuerdo, name="detalle_acuerdo"),
+    path('aprobar_acuerdo/<int:id>', aprobar_acuerdo, name="aprobar_acuerdo"),
 ]

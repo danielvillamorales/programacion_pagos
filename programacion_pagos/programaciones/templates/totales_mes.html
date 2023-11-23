@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+<div class="col-12 container-fluid">
+    <div class="p-2">
+    <h6 class="text-primary">Acuerdo de pago {{cuotas.0.año}} - {{cuotas.0.mes}}</h6>
+    <h6 class="text-secondary d-flex justify-content-between">
+        <span class="text-danger" title="Total">Pendiente $ {{ total_pendientes.total | intcomma}}</span>
+        <span class="text-primary" title="Total">Pagado $ {{ total_aprobados.total | intcomma}}</span>
+    </h6>
+    </div>
+
+<div class="mt-2">
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Año</th>
+                <th>Mes</th>
+                <th>Dia</th>
+                <th>Pagado</th>
+                <th>Pendiente</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cuota in cuotas %}
+            <tr>
+                <td>{{cuota.año}}</td>
+                <td>{{cuota.mes_nombre}}</td>
+                <td>{{cuota.dia}}</td>
+                <td>{{cuota.pagado | intcomma}}</td>
+                <td>{{cuota.pendiente | intcomma}}</td>
+                <td>
+                    <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}" class="bg-primary">
+                        <span class="text-white p-3"><b>VER</b></span></a>
+                </td>
+            </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endblock %}

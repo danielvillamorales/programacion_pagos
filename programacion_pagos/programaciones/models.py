@@ -74,3 +74,16 @@ class ProgramacionPagosAprobados(models.Model):
     class Meta:
         managed = False
         db_table = 'programacion_pagos_aprobados'
+
+
+class Acuerdos(models.Model):
+    año = models.IntegerField()
+    mes = models.IntegerField()
+    dia = models.IntegerField()
+    proovedoor = models.CharField(max_length=300)
+    cuota = models.IntegerField()
+    observaciones = models.CharField(max_length=300, blank=True, null=True)
+    estado = models.CharField(max_length=2 , choices=ESTADOS, default='0')
+
+    def __str__(self):
+        return f'{self.año} - {self.mes} - {self.dia} - {self.proovedoor} - {self.cuota} - {self.observaciones} - {self.estado}'

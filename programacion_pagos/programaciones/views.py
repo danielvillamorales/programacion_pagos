@@ -2,20 +2,24 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from datetime import datetime, date, timedelta
 import openpyxl
-from .models import Pagos, CuentasBancarias,ProgramacionPagosAprobados
+from .models import Pagos, CuentasBancarias,ProgramacionPagosAprobados,Acuerdos
 import xlwt
 from django.http import HttpResponse
 from io import BytesIO
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.db.models import F, Value, Case, When, CharField, Value
+from django.db.models import F, Value, Case, When, CharField, Value, IntegerField
 from django.db.models.functions import Concat
 from django.db.models import Subquery, OuterRef
 from django.db.models import Sum
+import locale
 
 # Create your views here.
 ESTADO = {'0':'Pendiente', '1':'Aprobado Jefe', '9':'Rechazado'}
 EMPRESAS_PERMITIDAS = ["ka", "pendientes", "dyjon", "pulman","nomina"]
+MESES = {1:'Enero', 2:'Febrero', 3:'Marzo', 4:'Abril', 5:'Mayo', 6:'Junio', 
+         7:'Julio', 8:'Agosto', 9:'Septiembre', 10:'Octubre', 11:'Noviembre', 
+         12:'Diciembre'}
 
 def crearObjeto(**kwargs):
     pago = Pagos()
@@ -284,3 +288,54 @@ def inactivar_cuenta(request, id):
         messages.warning(request, 'No tiene permisos para inactivar cuentas')
     return redirect('cuentas')
 
+
+def totales_ano(request):
+    cuotas = Acuerdos.objects.all().values('año','mes').annotate(total=Sum('cuota'),
+                                                                 pendiente=Sum(Case(When(estado='0', then='cuota'), default=Value(0), output_field=IntegerField()))
+                                                                                    ).order_by('año','mes')
+    total_pendientes = Acuerdos.objects.filter(estado = '0').aggregate(total=Sum('cuota'))
+    total_aprobados = Acuerdos.objects.filter(estado = '1').aggregate(total=Sum('cuota'))
+    return render(request, 'totales_ano.html', {'cuotas':cuotas, 'total_pendientes':total_pendientes, 'total_aprobados':total_aprobados})
+
+def totales_mes(request, anio , mes):
+    cuotas = Acuerdos.objects.filter(año=anio, mes=mes).values('año','mes', 'dia').annotate(
+        total=Sum('cuota'),
+        pendiente=Sum(Case(When(estado='0', then='cuota'), default=Value(0), output_field=IntegerField())),
+        pagado = Sum(Case(When(estado='1', then='cuota'), default=Value(0), output_field=IntegerField()))).order_by('año','mes','dia')
+    
+    for cuota in cuotas:
+        cuota['mes_nombre'] = MESES.get(int(cuota['mes']))
+    total_pendientes = Acuerdos.objects.filter(año=anio, mes=mes, estado = '0').aggregate(total=Sum('cuota'))
+    total_aprobados = Acuerdos.objects.filter(año=anio, mes=mes, estado = '1').aggregate(total=Sum('cuota'))
+    return render(request, 'totales_mes.html', {'cuotas':cuotas, 'total_pendientes':total_pendientes, 'total_aprobados':total_aprobados})
+
+def get_dia_semana(año, mes ,dia):
+    fecha = date(año, mes, dia)
+    # Establecer la configuración regional a español
+    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+
+    # Obtener el nombre del día de la semana en español
+    nombre_dia = fecha.strftime("%A")
+
+    # Restablecer la configuración regional a la predeterminada
+    locale.setlocale(locale.LC_TIME, '')
+
+    return nombre_dia
+
+def detalle_acuerdo(request, anio , mes, dia):
+    cuotas = Acuerdos.objects.filter(año=anio, mes=mes, dia=dia).order_by('estado','año','mes','dia')
+    for cuota in cuotas:
+        cuota.nombre_dia = get_dia_semana(cuota.año , cuota.mes , cuota.dia)
+    return render(request, 'detalle_acuerdo.html', {'cuotas':cuotas})
+
+def aprobar_acuerdo(request, id):
+    if request.user.has_perm('programaciones.aprobar_pago'):
+        cuota = Acuerdos.objects.get(id=id)
+        cuota.estado = '1'
+        cuota.save()
+        messages.success(request, 'Cuota aprobada correctamente')
+        return redirect('detalle_acuerdo', cuota.año, cuota.mes, cuota.dia)
+    else:
+        messages.warning(request, 'No tiene permisos para aprobar cuotas')
+        return redirect('totales_mes')
+    
