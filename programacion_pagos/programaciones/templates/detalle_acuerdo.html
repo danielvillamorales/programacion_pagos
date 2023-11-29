@@ -5,8 +5,14 @@
     <div class="p-2">
     <h6 class="text-secondary">Acuerdo de pago {{cuotas.0.nombre_dia}} {{cuotas.0.dia}}/{{cuotas.0.mes}}/{{cuotas.0.año}}</h6>
     <a href="{% url 'totales_mes' anio=cuotas.0.año mes=cuotas.0.mes%}" class="btn btn-sm btn-primary">volver</a>
+    {% if cuotas.0.estado == '0'  %}
+    <a href="{% url 'aprobar_acuerdo' cuotas.0.id %}" class="btn btn-success btn-sm">Aprobar</a>
+    {% else %}
+       <button class="btn btn-sm btn-info">ya estan aprobados</button> 
+    {% endif %}
     </div>
     <div class="container-fluid">
+           
     <table class="table table-sm">
         <thead class="table-dark">
             <tr>
@@ -14,24 +20,16 @@
                 <th>proveedor</th>
                 <th>valor</th>
                 <th>observaciones</th>
-                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for cuota in cuotas %}
             <tr>
                 <td>{{cuota.dia}}: {{ cuota.nombre_dia }}</td>
-                <td>{{ cuota.proovedoor }}</td>
+                <td>{{cuota.nit}} {{ cuota.proovedoor }}</td>
                 <td>{{ cuota.cuota | intcomma}} 
                 </td>
                 <td>{{ cuota.observaciones }}
-                </td>
-                <td>
-                    {% if cuota.estado == '0'  %}
-                    <a href="{% url 'aprobar_acuerdo' cuota.id %}" class="bg-primary"><span class="p-3 text-white"><b>Aprobar</b></span></a>
-                    {% else %}
-                    ok
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

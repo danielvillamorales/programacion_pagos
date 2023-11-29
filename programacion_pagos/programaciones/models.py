@@ -79,7 +79,8 @@ class ProgramacionPagosAprobados(models.Model):
 class Acuerdos(models.Model):
     año = models.IntegerField()
     mes = models.IntegerField()
-    dia = models.IntegerField()
+    dia = models.IntegerField(default=0)
+    nit = models.CharField(max_length=30)
     proovedoor = models.CharField(max_length=300)
     cuota = models.IntegerField()
     observaciones = models.CharField(max_length=300, blank=True, null=True)

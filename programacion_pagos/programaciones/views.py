@@ -334,9 +334,12 @@ def detalle_acuerdo(request, anio , mes, dia):
 def aprobar_acuerdo(request, id):
     if request.user.has_perm('programaciones.aprobar_pago'):
         cuota = Acuerdos.objects.get(id=id)
-        cuota.estado = '1'
-        cuota.save()
-        messages.success(request, 'Cuota aprobada correctamente')
+        acuerdos = Acuerdos.objects.filter(año=cuota.año, mes=cuota.mes, dia=cuota.dia)
+        if len(acuerdos) > 0:
+            acuerdos.update(estado='1')
+            messages.success(request, 'Cuota aprobada correctamente')
+        else:
+            messages.warning(request, 'Error al aprobar cuotas')
         return redirect('detalle_acuerdo', cuota.año, cuota.mes, cuota.dia)
     else:
         messages.warning(request, 'No tiene permisos para aprobar cuotas')

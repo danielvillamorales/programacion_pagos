@@ -31,8 +31,8 @@
                 <td>{{cuota.pagado | intcomma}}</td>
                 <td>{{cuota.pendiente | intcomma}}</td>
                 <td>
-                    <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}" class="bg-primary">
-                        <span class="text-white p-3"><b>VER</b></span></a>
+                    <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}" class="btn btn-primary btn-sm">
+                       VER
                 </td>
             </tr>
             {% endfor%}
