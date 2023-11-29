@@ -305,6 +305,7 @@ def totales_mes(request, anio , mes):
     
     for cuota in cuotas:
         cuota['mes_nombre'] = MESES.get(int(cuota['mes']))
+        cuota['dia_nombre'] = get_dia_semana(cuota['año'] , cuota['mes'] , cuota['dia'])
     total_pendientes = Acuerdos.objects.filter(año=anio, mes=mes, estado = '0').aggregate(total=Sum('cuota'))
     total_aprobados = Acuerdos.objects.filter(año=anio, mes=mes, estado = '1').aggregate(total=Sum('cuota'))
     return render(request, 'totales_mes.html', {'cuotas':cuotas, 'total_pendientes':total_pendientes, 'total_aprobados':total_aprobados})
@@ -312,10 +313,12 @@ def totales_mes(request, anio , mes):
 def get_dia_semana(año, mes ,dia):
     fecha = date(año, mes, dia)
     # Establecer la configuración regional a español
-    locale.setlocale(locale.LC_TIME, 'es_ES.UTF-8')
+    locale.setlocale(locale.LC_TIME, 'es_ES')
 
     # Obtener el nombre del día de la semana en español
     nombre_dia = fecha.strftime("%A")
+    nombre_dia = nombre_dia.upper()
+    #print(nombre_dia)
 
     # Restablecer la configuración regional a la predeterminada
     locale.setlocale(locale.LC_TIME, '')
