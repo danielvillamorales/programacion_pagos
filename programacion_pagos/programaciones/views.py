@@ -13,6 +13,8 @@ from django.db.models.functions import Concat
 from django.db.models import Subquery, OuterRef
 from django.db.models import Sum
 import locale
+import pandas as pd
+import io
 
 # Create your views here.
 ESTADO = {'0':'Pendiente', '1':'Aprobado Jefe', '9':'Rechazado'}
@@ -171,7 +173,10 @@ def borrar_pendientes(request):
 
 def historico(request):
     if request.method == 'POST':
-        return exportar_clientes(request)
+        if request.POST.get('tipo') == 'acuerdo':
+            return exportar_acuerdo(request)
+        else:
+            return exportar_clientes(request)
     return render(request, 'historico.html')
 
 
@@ -251,6 +256,22 @@ def exportar_clientes(request):
     # Configurar el contenido del búfer como contenido de la respuesta
     response.write(output.getvalue())
     
+    return response
+
+def exportar_acuerdo(request):
+    fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
+    cuotas = Acuerdos.objects.filter(año = fecha.year,
+                                     mes = fecha.month, 
+                                    dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
+    df = pd.DataFrame(cuotas, columns=['año','mes','dia','nit','proovedoor','cuota','observaciones','estado'])
+    output = io.BytesIO()
+    writer = pd.ExcelWriter(output, engine='openpyxl')
+    df.to_excel(writer, sheet_name='pagos_acuerdo', index=False)
+    writer.close()
+    response = HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=pagos_acuerdo.xlsx'
+    output.seek(0)
+    response.write(output.getvalue())
     return response
 
 def agregar_cuenta(request):
