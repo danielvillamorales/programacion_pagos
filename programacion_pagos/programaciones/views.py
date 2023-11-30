@@ -193,10 +193,32 @@ def pagos_aprobados(request):
     pagos_dyjon = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
                                  empresa = 'dyjon',
                                  estado = '1').order_by('empresa', '-valor')
+    
+    acuerdos = Acuerdos.objects.filter(año = fecha.year,
+                                     mes = fecha.month, 
+                                    dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
+    cuentas_bancarias = CuentasBancarias.objects.filter(estado = '0').values_list('nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion')
+    df = pd.DataFrame(acuerdos, columns=['año','mes','dia','nit','proovedoor','cuota','observaciones','estado'])
+    df_cuentas = pd.DataFrame(cuentas_bancarias, columns=['nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion'])
+    df = pd.merge(df, df_cuentas, on=['nit','nit'], how='left')
+    # Fusionar columnas 'banco', 'tipo_cuenta' y 'numero_cuenta' en una sola columna
+    df['cuenta_bancarias'] = df[['banco', 'tipo_cuenta', 'numero_cuenta']].apply(
+        lambda x: ' - '.join(x.dropna().astype(str)), axis=1
+    )
+    # Agrupar por NIT y concatenar las cuentas
+    df_grouped = df.groupby('nit').agg({
+        'digito_verificacion': 'first',
+        'proovedoor': 'first',
+        'cuota': 'first',
+        'observaciones': 'first',
+        'cuenta_bancarias': lambda x: ', '.join(x.dropna().astype(str)),
+    }).reset_index()
+
+
+    html_table = df_grouped.to_html(classes='table table-striped', index=False)
     for pago in pagos:
         pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
         
-
     for pago in pagos_pulman:
         pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
 
@@ -212,7 +234,8 @@ def pagos_aprobados(request):
     return render(request, 'aprobados.html',{'pagos':pagos, 'total':total, 'pagos_pulman':pagos_pulman, 
                                              'total_pulman':total_pulman, 'pagos_dyjon':pagos_dyjon, 
                                              'total_dyjon':total_dyjon, 'total_rechazados_pulman':total_rechazados_pulman,
-                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados})
+                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados,
+                                             'html_table':html_table})
 
 
 def exportar_clientes(request):
@@ -263,10 +286,30 @@ def exportar_acuerdo(request):
     cuotas = Acuerdos.objects.filter(año = fecha.year,
                                      mes = fecha.month, 
                                     dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
+    cuentas_bancarias = CuentasBancarias.objects.filter(estado = '0').values_list('nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion')
     df = pd.DataFrame(cuotas, columns=['año','mes','dia','nit','proovedoor','cuota','observaciones','estado'])
+    df_cuentas = pd.DataFrame(cuentas_bancarias, columns=['nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion'])
+    df = pd.merge(df, df_cuentas, on=['nit','nit'], how='left')
+    # Fusionar columnas 'banco', 'tipo_cuenta' y 'numero_cuenta' en una sola columna
+    df['cuenta_bancarias'] = df[['banco', 'tipo_cuenta', 'numero_cuenta']].apply(
+        lambda x: ' - '.join(x.dropna().astype(str)), axis=1
+    )
+    # Agrupar por NIT y concatenar las cuentas
+    df_grouped = df.groupby('nit').agg({
+        'cuenta_bancarias': lambda x: ', '.join(x.dropna().astype(str)),
+        'digito_verificacion': 'first',
+        'año': 'first',
+        'mes': 'first',
+        'dia': 'first',
+        'proovedoor': 'first',
+        'cuota': 'first',
+        'observaciones': 'first',
+        'estado': 'first',
+    }).reset_index()
+
     output = io.BytesIO()
     writer = pd.ExcelWriter(output, engine='openpyxl')
-    df.to_excel(writer, sheet_name='pagos_acuerdo', index=False)
+    df_grouped.to_excel(writer, sheet_name='pagos_acuerdo', index=False)
     writer.close()
     response = HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename=pagos_acuerdo.xlsx'

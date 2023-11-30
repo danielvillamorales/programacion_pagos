@@ -21,6 +21,10 @@
             </form>
         </div>
         <div class="">
+            {% if html_table %}
+            <h6 class="text-secondary">Acuerdo</h6>
+            {{html_table | safe}}
+            {% endif %}
             {% if total_nomina > 0 %}
             <h6 class="text-secondary">Pagos {{ pagos_nomina.0.fecha_pago }}: {{ pagos_nomina.0.empresa | upper}}</h6>
             <h6 class="text-secondary">$ {{ total_nomina| intcomma}}</h6>
