@@ -13,13 +13,12 @@
     </div>
     <div class="container-fluid">
            
-    <table class="table table-sm">
+    <table class="table">
         <thead class="table-dark">
             <tr>
                 <th>dia</th>
                 <th>proveedor</th>
                 <th>valor</th>
-                <th>observaciones</th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +28,6 @@
                 <td>{{cuota.nit}} {{ cuota.proovedoor }}</td>
                 <td>{{ cuota.cuota | intcomma}} 
                 </td>
-                <td>{{ cuota.observaciones }}
                 </td>
             </tr>
             {% endfor %}
