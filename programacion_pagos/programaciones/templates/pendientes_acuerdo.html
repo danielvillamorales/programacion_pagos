@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+
+<div class="container-fluid">
+    <div class="row p-1">
+
+        <div class="col-6">
+            <h6 class="text-danger text-center">Pendientes <span id="total-pnd"
+                class="float-right mt-2 text-danger text-end">: $0</span></h6>
+            <hr>
+            <ul class="list-group border border-secondary p-1" id="div1" ondrop="drop(event)"
+                ondragover="allowDrop(event)" style="min-height: 100px;">
+                {% for acuerdo in acuerdos %}
+                <li draggable="true" ondragstart="drag(event)" id="drag{{acuerdo.id}}" height="31"
+                    class="list-group-item list-group-item-action list-group-item-light m-1" value="{{acuerdo.id}}">
+                    {{acuerdo.proovedoor}}: {{acuerdo.cuota | intcomma}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="col-6">
+            <h6 class="text-success text-center">Pagos Hoy <span id="total-value"
+                    class="float-right mt-2 text-success text-end">: $0</span></h6>
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="selected_items" id="selected-items-input" value="">
+                <ul class="list-group border border-secondary p-1" id="div2" ondrop="drop(event)"
+                    ondragover="allowDrop(event)" style="min-height: 100px;">
+                </ul>
+                <button class="btn btn-outline-secondary btn-sm mt-1" type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    //function drop(ev) {
+    //    ev.preventDefault();
+    //    var data = ev.dataTransfer.getData("text");
+    //    ev.target.append(document.getElementById(data));
+    //}
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("text");
+        ev.target.append(document.getElementById(data));
+        var total = 0;
+        var items = document.querySelectorAll('#div2 li');
+        var total = 0;
+        items.forEach(function (item) {
+            total += parseInt(item.textContent.split(':')[1].replace('.', '').replace('.', ''));
+            item.style.pointerEvents = 'none';
+        });
+        var formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        document.getElementById('total-value').textContent = ': $ ' + formattedTotal;
+        updateSelectedItemsInput();
+        total_pnd();
+    }
+
+    function total_pnd(){
+        var items = document.querySelectorAll('#div1 li');
+        var total = 0;
+        items.forEach(function (item) {
+            total += parseInt(item.textContent.split(':')[1].replace('.', '').replace('.', ''));
+        });
+        var formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        document.getElementById('total-pnd').textContent = ': $ ' + formattedTotal;
+    }
+    function updateSelectedItemsInput() {
+        // Obtener elementos seleccionados y actualizar el campo oculto
+        var selectedItems = Array.from(document.querySelectorAll('#div2 li'))
+            .map(item => item.getAttribute('value'));
+        document.getElementById('selected-items-input').value = selectedItems.join(',');
+    }
+
+    const div1 = document.getElementById('div1');
+    const div2 = document.getElementById('div2');
+    total_pnd();
+
+    //div2.style.minHeight = div1.clientHeight + 'px';    
+</script>
+
+
+{% endblock %}

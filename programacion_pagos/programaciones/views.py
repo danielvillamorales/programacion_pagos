@@ -409,3 +409,25 @@ def aprobar_acuerdo(request, id):
         messages.warning(request, 'No tiene permisos para aprobar cuotas')
         return redirect('totales_mes')
     
+def pendientes_acuerdo(request):
+    mes = date.today().month
+    año = date.today().year
+    dia = date.today().day
+    acuerdos = Acuerdos.objects.filter(año=año, mes=mes, estado='0').order_by('-cuota')
+    if request.method == 'POST':
+        ultimo_dia_acuerdos = Acuerdos.objects.filter(año=año, mes=mes).order_by('-dia').first()
+        acuerdos_aprobados = Acuerdos.objects.filter(año=año, mes=mes, dia = dia ,estado='1')
+        if len(acuerdos_aprobados) > 0:
+            messages.warning(request, 'Ya existen cuotas aprobadas para este dia no se puede modificar')
+            return render(request, 'pendientes_acuerdo.html', {'acuerdos':acuerdos})
+        if ultimo_dia_acuerdos.dia == dia:
+            messages.warning(request, 'es el ultimo dia disponible del mes no se pueden agregar mas cuotas')
+            return redirect('detalle_acuerdo', año, mes, dia)
+        else:
+            print(ultimo_dia_acuerdos.dia)
+            Acuerdos.objects.filter(año=año, mes=mes, dia= dia, estado ='0').update(dia = ultimo_dia_acuerdos.dia)
+            lista = request.POST.get('selected_items').split(',')
+            Acuerdos.objects.filter(id__in=lista).update(dia = dia)
+            return redirect('detalle_acuerdo', año, mes, dia)
+    return render(request, 'pendientes_acuerdo.html', {'acuerdos':acuerdos})
+    
