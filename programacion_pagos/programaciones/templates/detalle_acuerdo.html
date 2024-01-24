@@ -3,12 +3,14 @@
 {% load humanize %}
 <div class="col-12">
     <div class="p-2">
+    {% if cuotas %}
     <h6 class="text-secondary">Acuerdo de pago {{cuotas.0.nombre_dia}} {{cuotas.0.dia}}/{{cuotas.0.mes}}/{{cuotas.0.año}}</h6>
     <a href="{% url 'totales_mes' anio=cuotas.0.año mes=cuotas.0.mes%}" class="btn btn-sm btn-primary">volver</a>
     {% if cuotas.0.estado == '0'  %}
     <a href="{% url 'aprobar_acuerdo' cuotas.0.id %}" class="btn btn-success btn-sm">Aprobar</a>
     {% else %}
        <button class="btn btn-sm btn-info">ya estan aprobados</button> 
+    {% endif %}
     {% endif %}
     </div>
     <div class="container-fluid">
@@ -19,6 +21,7 @@
                 <th>dia</th>
                 <th>proveedor</th>
                 <th>valor</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -26,8 +29,16 @@
             <tr>
                 <td>{{cuota.dia}}: {{ cuota.nombre_dia }}</td>
                 <td>{{cuota.nit}} {{ cuota.proovedoor }}</td>
-                <td>{{ cuota.cuota | intcomma}} 
-                </td>
+                <td>{{ cuota.cuota | intcomma}} </td>
+                <td>
+                    {% if cuota.estado == '0' %}
+                    <a class="btn btn-sm btn-success material-symbols-outlined" style="cursor:pointer;" href="{% url 'aprobar_unico' cuota.id %}" >
+                    check
+                    </a>
+                    <a class="btn btn-sm btn-danger material-symbols-outlined" style="cursor:pointer;" href="{% url 'rechazar_acuerdo' cuota.id %}" >
+                        cancel
+                    </a>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

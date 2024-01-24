@@ -14,7 +14,7 @@
                 {% for acuerdo in acuerdos %}
                 <li draggable="true" ondragstart="drag(event)" id="drag{{acuerdo.id}}" height="31"
                     class="list-group-item list-group-item-action list-group-item-light m-1" value="{{acuerdo.id}}">
-                    {{acuerdo.proovedoor}}: {{acuerdo.cuota | intcomma}}</li>
+                  Día {{acuerdo.dia}} - {{acuerdo.proovedoor}}: {{acuerdo.cuota | intcomma}}</li>
                 {% endfor %}
             </ul>
         </div>
