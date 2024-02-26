@@ -33,6 +33,7 @@ class Pagos(models.Model):
     descuento = models.CharField(max_length=20)
     valor = models.IntegerField(default=0)
     estado = models.CharField(max_length=2 , choices=ESTADOS, default='0')
+    revision = models.IntegerField(blank=True, null=True, default=0, help_text='0: Pendiente, 1: Revisado')
 
     def __str__(self) -> str:
         return f'{self.id} {self.nit} - {self.proveedor} - {self.descripcion} - {self.concepto} - {self.valor}'
@@ -70,6 +71,7 @@ class ProgramacionPagosAprobados(models.Model):
     estado = models.CharField(max_length=2, blank=True, null=True)
     empresa = models.CharField(max_length=20, blank=True, null=True)
     cuentas_concatenadas = models.TextField(blank=True, null=True)
+    revision = models.IntegerField(blank=True, null=True, default=0, help_text='0: Pendiente, 1: Revisado')
 
     class Meta:
         managed = False

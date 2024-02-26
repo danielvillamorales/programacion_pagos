@@ -183,17 +183,18 @@ def historico(request):
 def pagos_aprobados(request):
     fecha = date.today()
     if request.method == 'POST':
-        fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
+        if request.POST.get('tipo') == 'buscador':
+            print('entro al buscador')
+            fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
+        else: 
+            numero = request.POST.get('validar')
+            pago = Pagos.objects.get(pk=numero)
+            pago.revision = 1
+            pago.save()
+            fecha = pago.fecha_pago
+            
     pagos = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
-                                 empresa = 'ka',
-                                 estado = '1').order_by('empresa', '-valor')
-    pagos_pulman = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
-                                 empresa = 'pulman',
-                                 estado = '1').order_by('empresa', '-valor')
-    pagos_dyjon = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
-                                 empresa = 'dyjon',
-                                 estado = '1').order_by('empresa', '-valor')
-    
+                                 estado = '1').order_by('revision','empresa', '-valor')  
     acuerdos = Acuerdos.objects.filter(año = fecha.year,
                                      mes = fecha.month, 
                                     dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
@@ -219,23 +220,14 @@ def pagos_aprobados(request):
     for pago in pagos:
         pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
         
-    for pago in pagos_pulman:
-        pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
-
-    for pago in pagos_dyjon:
-        pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
-
-    total = sum(pago.valor for pago in pagos)
-    total_pulman = sum(pago.valor for pago in pagos_pulman)
-    total_dyjon = sum(pago.valor for pago in pagos_dyjon)
-    total_rechazados_pulman = 0 
-    total_rechazados_dyjon = 0
-    total_rechazados = 0 
-    return render(request, 'aprobados.html',{'pagos':pagos, 'total':total, 'pagos_pulman':pagos_pulman, 
-                                             'total_pulman':total_pulman, 'pagos_dyjon':pagos_dyjon, 
-                                             'total_dyjon':total_dyjon, 'total_rechazados_pulman':total_rechazados_pulman,
-                                             'total_rechazados_dyjon':total_rechazados_dyjon, 'total_rechazados':total_rechazados,
+    total = sum(pago.valor for pago in pagos.filter(empresa = 'ka'))
+    total_pulman = sum(pago.valor for pago in pagos.filter(empresa = 'pulman'))
+    total_dyjon = sum(pago.valor for pago in pagos.filter(empresa = 'dyjon'))
+    return render(request, 'aprobados.html',{'pagos':pagos, 'total':total,
+                                             'total_pulman':total_pulman,
+                                             'total_dyjon':total_dyjon,
                                              'html_table':html_table})
+
 
 
 def exportar_clientes(request):

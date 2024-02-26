@@ -16,13 +16,13 @@ a {
 
 }
 .table{
-    font-size: 14px;
+    font-size: 12px;
 }
 
 
 .table-sm {
     position: relative;
-    font-size: x-small;
+    font-size: 12px;
     align-items: center;
 }
 
