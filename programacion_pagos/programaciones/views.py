@@ -220,7 +220,7 @@ def pagos_aprobados(request):
     for pago in pagos:
         pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
         
-    total = sum(pago.valor for pago in pagos.filter(empresa = 'ka'))
+    total = sum(pago.valor for pago in pagos.filter(empresa = 'ka')) # type: ignore
     total_pulman = sum(pago.valor for pago in pagos.filter(empresa = 'pulman'))
     total_dyjon = sum(pago.valor for pago in pagos.filter(empresa = 'dyjon'))
     return render(request, 'aprobados.html',{'pagos':pagos, 'total':total,
