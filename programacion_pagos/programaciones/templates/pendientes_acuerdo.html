@@ -6,11 +6,11 @@
     <div class="row p-1">
 
         <div class="col-6">
-            <h6 class="text-danger text-center">Pendientes <span id="total-pnd"
+            <h6 class="text-danger text-center" >Pendientes <span id="total-pnd"
                 class="float-right mt-2 text-danger text-end">: $0</span></h6>
             <hr>
             <ul class="list-group border border-secondary p-1" id="div1" ondrop="drop(event)"
-                ondragover="allowDrop(event)" style="min-height: 100px;">
+                ondragover="allowDrop(event)" style="min-height: 100px; max-height: 35em; overflow-y: auto;">
                 {% for acuerdo in acuerdos %}
                 <li draggable="true" ondragstart="drag(event)" id="drag{{acuerdo.id}}" height="31"
                     class="list-group-item list-group-item-action list-group-item-light m-1" value="{{acuerdo.id}}">
