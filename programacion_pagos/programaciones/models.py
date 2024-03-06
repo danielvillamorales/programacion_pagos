@@ -87,6 +87,7 @@ class Acuerdos(models.Model):
     cuota = models.IntegerField()
     observaciones = models.CharField(max_length=300, blank=True, null=True)
     estado = models.CharField(max_length=2 , choices=ESTADOS, default='0')
+    revision = models.IntegerField(blank=True, null=True, default=0, help_text='0: Pendiente, 1: Revisado')
 
     def __str__(self):
         return f'{self.año} - {self.mes} - {self.dia} - {self.proovedoor} - {self.cuota} - {self.observaciones} - {self.estado}'

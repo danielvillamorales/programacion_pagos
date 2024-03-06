@@ -12,10 +12,11 @@
 </div>
 <div class="row mt-2">
 {% for cuota in cuotas %}
+{% if cuota.pendiente > 0 %}
 <div class="col-sm-3 col-6 mt-1">
     <div class="card p-1" >
         <div class="card-header">
-        Cuota {{cuota.año}} - {{cuota.mes}}
+        {{cuota.año}} - {{cuota.mes_nombre}} Cuota # {{cuota.numero_de_cuota}}
         </div>
         <div class="card-body">
             <h6 class="card-title text-center text-primary">
@@ -28,6 +29,7 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endfor %}
 </div>
 {% endblock %}

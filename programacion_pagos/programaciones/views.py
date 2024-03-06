@@ -188,45 +188,55 @@ def pagos_aprobados(request):
             fecha = datetime.strptime(request.POST.get('ifecha'), '%Y-%m-%d').date()
         else: 
             numero = request.POST.get('validar')
-            pago = Pagos.objects.get(pk=numero)
-            pago.revision = 1
-            pago.save()
-            fecha = pago.fecha_pago
+
+            if 'acuerdo' in numero:
+                print('entro al acuerdo')
+                numero = numero.replace('acuerdo','')
+                acuerdo = Acuerdos.objects.get(pk=numero)
+                acuerdo.revision = '1'
+                acuerdo.save()
+                fecha = date(acuerdo.año, acuerdo.mes, acuerdo.dia)
+            else:  
+                pago = Pagos.objects.get(pk=numero)
+                pago.revision = 1
+                pago.save()
+                fecha = pago.fecha_pago
             
     pagos = ProgramacionPagosAprobados.objects.filter(fecha_pago = fecha, 
                                  estado = '1').order_by('revision','empresa', '-valor')  
-    acuerdos = Acuerdos.objects.filter(año = fecha.year,
-                                     mes = fecha.month, 
-                                    dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
-    cuentas_bancarias = CuentasBancarias.objects.filter(estado = '0').values_list('nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion')
-    df = pd.DataFrame(acuerdos, columns=['año','mes','dia','nit','proovedoor','cuota','observaciones','estado'])
-    df_cuentas = pd.DataFrame(cuentas_bancarias, columns=['nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion'])
-    df = pd.merge(df, df_cuentas, on=['nit','nit'], how='left')
+    #acuerdos = Acuerdos.objects.filter(año = fecha.year,
+    #                                 mes = fecha.month, 
+    #                                dia = fecha.day , estado = '1').values_list('año','mes','dia','nit','proovedoor','cuota','observaciones','estado').order_by('año','mes','dia')
+    #cuentas_bancarias = CuentasBancarias.objects.filter(estado = '0').values_list('nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion')
+    #df = pd.DataFrame(acuerdos, columns=['año','mes','dia','nit','proovedoor','cuota','observaciones','estado'])
+    #df_cuentas = pd.DataFrame(cuentas_bancarias, columns=['nit','banco','tipo_cuenta','numero_cuenta','digito_verificacion'])
+    #df = pd.merge(df, df_cuentas, on=['nit','nit'], how='left')
     # Fusionar columnas 'banco', 'tipo_cuenta' y 'numero_cuenta' en una sola columna
-    df['cuenta_bancarias'] = df[['banco', 'tipo_cuenta', 'numero_cuenta']].apply(
-        lambda x: ' - '.join(x.dropna().astype(str)), axis=1
-    )
+    #df['cuenta_bancarias'] = df[['banco', 'tipo_cuenta', 'numero_cuenta']].apply(
+    #    lambda x: ' - '.join(x.dropna().astype(str)), axis=1
+    #)
     # Agrupar por NIT y concatenar las cuentas
-    df_grouped = df.groupby('nit').agg({
-        'digito_verificacion': 'first',
-        'proovedoor': 'first',
-        'cuota': 'first',
-        'observaciones': 'first',
-        'cuenta_bancarias': lambda x: ', '.join(x.dropna().astype(str)),
-    }).reset_index()
+    #df_grouped = df.groupby('nit').agg({
+    #    'digito_verificacion': 'first',
+    #    'proovedoor': 'first',
+    #    'cuota': 'first',
+    #    'observaciones': 'first',
+    #    'cuenta_bancarias': lambda x: ', '.join(x.dropna().astype(str)),
+    #}).reset_index()
 
 
-    html_table = df_grouped.to_html(classes='table table-striped', index=False)
+    #html_table = df_grouped.to_html(classes='table table-striped', index=False)
     for pago in pagos:
         pago.cuentas_concatenadas = pago.cuentas_concatenadas.replace('|', '<br>') if pago.cuentas_concatenadas else ''
         
     total = sum(pago.valor for pago in pagos.filter(empresa = 'ka')) # type: ignore
     total_pulman = sum(pago.valor for pago in pagos.filter(empresa = 'pulman'))
     total_dyjon = sum(pago.valor for pago in pagos.filter(empresa = 'dyjon'))
+    total_acuerdo = sum(pago.valor for pago in pagos.filter(empresa = 'acuerdo'))
     return render(request, 'aprobados.html',{'pagos':pagos, 'total':total,
                                              'total_pulman':total_pulman,
-                                             'total_dyjon':total_dyjon,
-                                             'html_table':html_table})
+                                             'total_dyjon':total_dyjon,'total_acuerdo':total_acuerdo})
+                                            
 
 
 
@@ -346,9 +356,30 @@ def inactivar_cuenta(request, id):
 
 
 def totales_ano(request):
+    month_names = {
+    1: 'Enero',
+    2: 'Febrero',
+    3: 'Marzo',
+    4: 'Abril',
+    5: 'Mayo',
+    6: 'Junio',
+    7: 'Julio',
+    8: 'Agosto',
+    9: 'Septiembre',
+    10: 'Octubre',
+    11: 'Noviembre',
+    12: 'Diciembre',
+    }
     cuotas = Acuerdos.objects.all().values('año','mes').annotate(total=Sum('cuota'),
                                                                  pendiente=Sum(Case(When(estado='0', then='cuota'), default=Value(0), output_field=IntegerField()))
                                                                                     ).order_by('año','mes')
+    
+    i=4
+    for cuota in cuotas:
+        
+        cuota['mes_nombre'] = month_names.get(cuota['mes'])
+        cuota['numero_de_cuota'] = i
+        i+=1
     total_pendientes = Acuerdos.objects.filter(estado = '0').aggregate(total=Sum('cuota'))
     total_aprobados = Acuerdos.objects.filter(estado = '1').aggregate(total=Sum('cuota'))
     return render(request, 'totales_ano.html', {'cuotas':cuotas, 'total_pendientes':total_pendientes, 'total_aprobados':total_aprobados})

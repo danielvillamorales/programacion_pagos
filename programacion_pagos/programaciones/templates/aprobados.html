@@ -21,15 +21,12 @@
             </form>
         </div>
         <div class="">
-            {% if html_table %}
-            <h6 class="text-secondary">Acuerdo</h6>
-            {{html_table | safe}}
-            {% endif %}
             <h6 class="text-secondary">Pagos Aprobados</h6>
             <h6 class="text-secondary">
                 <span class="badge bg-primary">KA: {{ total | intcomma}}</span>
                 <span class="badge bg-primary">DYJON: {{total_dyjon | intcomma}}</span>
                 <span class="badge bg-primary">PULMAN: {{total_pulman | intcomma}}</span>
+                <span class="badge bg-primary">ACUERDO: {{total_acuerdo | intcomma}}</span>
             </h6>
             <hr>
             <table class="table" aria-describedby="tabla de empresa">
@@ -68,7 +65,7 @@
                                     {% if pago.revision == 0 %}
                                     <form method="post">
                                         {% csrf_token %}
-                                        <button type="submit" title="revisado" value="{{pago.id}}" name="validar" class="material-symbols-outlined" style="color:white; background-color: rgb(4, 26, 112); border-radius: 5px;">
+                                        <button type="submit" title="revisado" value="{% if pago.empresa == 'acuerdo' %} acuerdo{{pago.id}} {% else %} {{pago.id}} {% endif %}" name="validar" class="material-symbols-outlined" style="color:white; background-color: rgb(4, 26, 112); border-radius: 5px;">
                                             check_circle
                                         </button>
                                     </form>
