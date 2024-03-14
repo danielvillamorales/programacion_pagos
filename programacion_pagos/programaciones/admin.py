@@ -7,6 +7,6 @@ admin.site.register(CuentasBancarias)
 
 @admin.register(Pagos)
 class PermisosAdmin(admin.ModelAdmin):
-    list_display = ('fecha_pago','nit', 'proveedor','valor','estado','empresa')
-    search_fields = ('fecha_pago','nit', 'proveedor','valor','estado','empresa')
+    list_display = ('fecha_pago','nit', 'proveedor','valor','estado','empresa','descripcion')
+    search_fields = ('fecha_pago','nit', 'proveedor','valor','estado','empresa','descripcion')
     ordering = ('-id',)
