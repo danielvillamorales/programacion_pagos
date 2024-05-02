@@ -89,6 +89,22 @@ def importar(request):
 
 @login_required(login_url='login') 
 def consulta(request):
+    if request.method == 'POST':
+        print('entro al post')
+        check = request.POST.getlist('check')
+        boton = request.POST.get('boton')
+        print(boton)
+        if len(check) == 0:
+            messages.warning(request, 'No se seleccionaron pagos')
+
+        if boton == 'aprobar':
+            Pagos.objects.filter(id__in=check).update(estado='1')
+            messages.success(request, 'Pagos aprobados correctamente')
+        elif boton == 'rechazar':
+            Pagos.objects.filter(id__in=check).update(estado='9')
+            messages.success(request, 'Pagos rechazados correctamente')
+        else:
+            messages.warning(request, 'Error al aprobar o rechazar pagos')
     pagos_nomina = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'nomina').order_by('estado','vencimiento','-valor')
     pagos = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'ka').order_by('estado','vencimiento','-valor')
     pagos_dyjon = Pagos.objects.filter(fecha_pago = date.today(), empresa = 'dyjon').order_by('estado','vencimiento','-valor')

@@ -6,7 +6,7 @@ from datetime import date
 
 ESTADOS = (
     ('0', 'Pendiente'),
-    ('1', 'Aprobado Jefe'),
+    ('1', 'Aprobado'),
     ('9', 'Rechazado')
 )
 
