@@ -84,6 +84,34 @@ a {
 }
 
 #check{
-    margin: 10px;
-    font-size: 15px;
+    margin: 8px;
+    font-size: 25px;
+}
+
+
+#done_all{
+    border-radius: 50%;
+    padding: 5px;
+    border-color: solid black ;
+    background-color: rgb(7, 116, 194);
+    color: thistle;
+    box-shadow: 0px 2px 5px 0px black;
+}
+
+#done{
+    border-radius: 50%;
+    padding: 5px;
+    border-color: solid black ;
+    background-color: rgb(0, 120, 72);
+    color: thistle;
+    box-shadow: 0px 2px 5px 0px black;
+}
+
+#cancel{
+    border-radius: 50%;
+    padding: 5px;
+    border-color: solid black ;
+    background-color: rgb(255, 0, 0);
+    color: rgb(235, 233, 235);
+    box-shadow: 0px 2px 5px 0px black;
 }
