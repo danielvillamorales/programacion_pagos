@@ -159,7 +159,7 @@
                         <tr>
                             <th>emision</th>
                             <th class="no-movil">vencimiento</th>
-                            <th class="no-">proveedor</th>
+                            <th class="">proveedor</th>
                             <th>descripcion</th>
                             <th class="no-movil">concepto</th>
                             <th>descuento</th>
@@ -176,13 +176,15 @@
                             </td>
                             <td class="no-movil">{{ pago.vencimiento }}</td>
                             <td>{{ pago.nit }} {{ pago.proveedor }}</td>
+                            <td>{{ pago.descripcion }} 
                                 <span class="movil">- Concepto: {{ pago.concepto }}</span>
                             </td>
                             <td class="no-movil">{{ pago.concepto }}
                             </td>
                             <td>{{ pago.descuento }}</td>
                             <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <td>
+                                {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
                                 <a href="{% url 'aprobar' pago.id %}">
                                     <span class="material-symbols-outlined p-1 done"  id="done">
                                         check_circle
@@ -206,9 +208,10 @@
                                     </span>
                                 </a>
                                 {% endif %}
-                            <td>
+                            </td>
+                            <td class="text-align">
                                 <div class="form-check form-switch d-flex justify-content-between">
-                                    <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check" name="check">
+                                    <input class="form-check-input"  type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
                                 </div>
                             </td>
                         </tr>
@@ -226,13 +229,12 @@
                         <tr>
                             <th>emision</th>
                             <th class="no-movil">vencimiento</th>
-
-                            <th >proveedor</th>
+                            <th class="">proveedor</th>
                             <th>descripcion</th>
                             <th class="no-movil">concepto</th>
                             <th>descuento</th>
                             <th>valor</th>
-                            <th>Accion</th>
+                            <th> Accion</th>
                             <th>Seleccion</th>
                         </tr>
                     </thead>
@@ -277,9 +279,9 @@
                                 </a>
                                 {% endif %}
                             </td>
-                            <td>
+                            <td class="text-align">
                                 <div class="form-check form-switch d-flex justify-content-between">
-                                    <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check" name="check">
+                                    <input class="form-check-input"  type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
                                 </div>
                             </td>
                         </tr>
