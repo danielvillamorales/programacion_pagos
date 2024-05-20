@@ -78,8 +78,8 @@
     
                 <h6 class="text-secondary">Pagos {{ pagos.0.fecha_pago }}: {{ pagos.0.empresa | upper}}</h6>
                 <h6 class="text-secondary d-flex justify-content-between">
-                    <span class="text-primary" title="Total">$ {{ total|add:total_rechazados | intcomma}}</span>
-                    <span class="text-success" title="Aprobado">$ {{ total| intcomma}}</span>  
+                    <span class="text-primary" title="Total">$ {{ total | intcomma}}</span>
+                    <span class="text-success" title="Aprobado">$ {{ total_pagos_ok| intcomma}}</span>  
                     <span class="text-danger" title="Rechazado"> $ {{total_rechazados | intcomma}}</span>
                 </h6>
                 <hr>
