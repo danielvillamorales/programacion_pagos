@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block content %}
+{% load humanize %}
+<div class="col-12">
+    <h6 class="text-secondary m-1">Buscar Pagos Aprobados</h6>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        <div class="input-group input-group-sm mb-3">
+            <input type="number" class="form-control" aria-label="Sizing example input"
+                aria-describedby="inputGroup-sizing-sm" name="nit" id="nit" placeholder="Nit...">
+            <input type="text" class="form-control" name="razon" id="razon" placeholder="Razon Social...">
+            <input type="number" class="form-control" name="valor" id="valor" placeholder="valor...">
+            <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        </div>
+    </form>
+</div>
+<div class="col-12">
+    <table class="table table-sm table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Nit</th>
+                <th>Proveedor</th>
+                <th>Fecha pago</th>
+                <th>Valor</th>
+                <th>Empresa</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pago in pagos %}
+            <tr>
+                <td>{{pago.nit}}</td>
+                <td>{{pago.proveedor}}</td>
+                <td>{{pago.fecha_pago}}</td>
+                <td>{{pago.valor | intcomma}}</td>
+                <td>{{pago.empresa}}</td>
+            </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

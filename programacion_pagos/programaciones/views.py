@@ -730,3 +730,24 @@ def pendientes_acuerdo(request):
         Acuerdos.objects.filter(id__in=lista).update(dia=dia)
         return redirect("detalle_acuerdo", año, mes, dia)
     return render(request, "pendientes_acuerdo.html", {"acuerdos": acuerdos})
+
+
+def busqueda(request):
+    pagos = []
+    if request.method == "POST":
+        valor = request.POST.get("valor")
+        razon = request.POST.get("razon").upper()
+        nit = request.POST.get("nit")
+
+        pagos = Pagos.objects.filter(estado="1").order_by("-fecha_pago")
+        if valor:
+            print("entre a valor")
+            pagos = pagos.filter(valor=valor).order_by("-fecha_pago")
+        if nit:
+            print("entre a nit")
+            pagos = pagos.filter(nit=nit).order_by("-fecha_pago")
+        if razon:
+            print("entre a razon")
+            pagos = pagos.filter(proveedor__icontains=razon).order_by("-fecha_pago")
+
+    return render(request, "busqueda.html", {"pagos": pagos})
