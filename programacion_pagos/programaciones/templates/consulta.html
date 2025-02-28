@@ -2,304 +2,317 @@
 {% block content %}
 {% load humanize %}
 <div class="col-12">
-    <form  method="post"> 
+    <form method="post">
         {% csrf_token %}
         <div class="container-fluid">
 
-           
-               {% if total_nomina > 0 %}
-               <h6 class="text-secondary">Pagos {{ pagos_nomina.0.fecha_pago }}: {{ pagos_nomina.0.empresa | upper}}</h6>
-               <h6 class="text-secondary">$ {{ total_nomina| intcomma}}</h6>
-               
-               <hr>
-               <table class="table table-sm">
-                   <thead class="table-dark">
-                       <tr>
-                           <th>emision</th>
-                           <th class="no-movil">vencimiento</th>
-                           <th class="no-">proveedor</th>
-                           <th>descripcion</th>
-                           <th class="no-movil">concepto</th>
-                           <th>descuento</th>
-                           <th>valor</th>
-                           <th>Accion</th>
-                           <th>Seleccion</th>
-                       </tr>
-                   </thead>
-                   <tbody class="table table-sm">
-                       {% for pago in pagos_nomina %}
-                       <tr class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
-                           <td>{{ pago.emision }}
-                               <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
-                           </td>
-                           <td class="no-movil">{{ pago.vencimiento }}</td>
-                           <td>{{ pago.nit }} {{ pago.proveedor }}</td>
-                           <td>{{ pago.descripcion }} 
-                               <span class="movil">- Concepto: {{ pago.concepto }}</span>
-                           </td>
-                           <td class="no-movil">{{ pago.concepto }}
-                           </td>
-                           <td>{{ pago.descuento }}</td>
-                           <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                           <td>
-                               {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                               <a href="{% url 'aprobar' pago.id %}">
-                                   <span class="material-symbols-outlined p-1 done" id="done">
-                                       check_circle
-                                       </span>
-                               </a>
-                               <a href="{% url 'rechazar' pago.id %}">
-                                   <span class="material-symbols-outlined p-1 cancel" id="cancel">
-                                       cancel
-                                   </span>
-                               </a>
-                               <input type="checkbox" class="form-check-input" >
-                               {% elif pago.estado == '9' %}
-                               <a  class="material-symbols-outlined done_all" id="done_all"
-                               href="{% url 'aprobar' pago.id %}">
-                                   done_all
-                               </a> 
-                               {% else %}
-                               {{pago.get_estado_display}}
-                               {% endif %}
-                           </td>
-                           <td>
-                               <div class="form-check form-switch d-flex justify-content-between">
-                                   <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
-                               </div>
-                           </td>
-                       </tr>
-                       {% endfor %}
-                   </tbody>
-               </table>
-               {% endif %}
-       
-                   <h6 class="text-secondary">Pagos {{ pagos.0.fecha_pago }}: {{ pagos.0.empresa | upper}}</h6>
-                   <h6 class="text-secondary d-flex justify-content-between">
-                       <span class="text-primary" title="Total">$ {{ total | intcomma}}</span>
-                       <span class="text-success" title="Aprobado">$ {{ total_pagos_ok| intcomma}}</span>  
-                       <span class="text-danger" title="Rechazado"> $ {{total_rechazados | intcomma}}</span>
-                   </h6>
-                   <hr>
-                   <table class="table table-sm">
-                       <thead class="table-dark">
-                           <tr>
-                               <th>emision</th>
-                               <th class="no-movil">vencimiento</th>
-                               <th class="">proveedor</th>
-                               <th>descripcion</th>
-                               <th class="no-movil">concepto</th>
-                               <th>descuento</th>
-                               <th>valor</th>
-                               <th> Accion</th>
-                               <th>Seleccion</th>
-                           </tr>
-                       </thead>
-                       <tbody class="table table-sm">
-                           {% for pago in pagos %}
-                           <tr class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
-                               <td>{{ pago.emision }}
-                                   <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.vencimiento }}</td>
-                               <td>{{ pago.nit }} {{ pago.proveedor }}</td>
-                               <td>{{ pago.descripcion }} 
-                                   <span class="movil">- Concepto: {{ pago.concepto }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.concepto }}
-                               </td>
-                               <td>{{ pago.descuento }}</td>
-                               <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                               <td>
-                                   {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                                   <a href="{% url 'aprobar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 done"  id="done">
-                                           check_circle
-                                           </span>
-                                   </a>
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 cancel" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   
-                                   {% elif pago.estado == '9' %}
-                                   <a  class="material-symbols-outlined done_all" id="done_all"  
-                                   href="{% url 'aprobar' pago.id %}">
-                                       done_all
-                                   </a> 
-                                   {% else %}
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   {% endif %}
-                               </td>
-                               <td class="text-align">
-                                   <div class="form-check form-switch d-flex justify-content-between">
-                                       <input class="form-check-input"  type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
-                                   </div>
-                               </td>
-                           </tr>
-                           {% endfor %}
-                       </tbody>
-                   </table>
-                   <hr>
-       
-                   <h6 class="text-secondary">Pagos {{ pagos_dyjon.0.fecha_pago }}: {{ pagos_dyjon.0.empresa | upper}}</h6>
-                   <h6 class="text-secondary d-flex justify-content-between">
-                       <span class="text-primary">$ {{ total_dyjon|add:total_rechazados_dyjon | intcomma}}</span>
-                       <span class="text-success">$ {{ total_dyjon| intcomma}}</span> 
-                       <span class="text-danger"> $ {{total_rechazados_dyjon | intcomma}}</span></h6>
-                   <hr>
-                   <table class="container-fluid table table-sm">
-                       <thead class="table-dark">
-                           <tr>
-                               <th>emision</th>
-                               <th class="no-movil">vencimiento</th>
-                               <th class="">proveedor</th>
-                               <th>descripcion</th>
-                               <th class="no-movil">concepto</th>
-                               <th>descuento</th>
-                               <th>valor</th>
-                               <th> Accion</th>
-                               <th>Seleccion</th>
-                           </tr>
-                       </thead>
-                       <tbody class="table table-sm">
-                           {% for pago in pagos_dyjon %}
-                           <tr class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
-                               <td>{{ pago.emision }}
-                                   <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.vencimiento }}</td>
-                               <td>{{ pago.nit }} {{ pago.proveedor }}</td>
-                               <td>{{ pago.descripcion }} 
-                                   <span class="movil">- Concepto: {{ pago.concepto }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.concepto }}
-                               </td>
-                               <td>{{ pago.descuento }}</td>
-                               <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                               <td>
-                                   {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                                   <a href="{% url 'aprobar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 done"  id="done">
-                                           check_circle
-                                           </span>
-                                   </a>
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 cancel" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   
-                                   {% elif pago.estado == '9' %}
-                                   <a  class="material-symbols-outlined done_all" id="done_all"  
-                                   href="{% url 'aprobar' pago.id %}">
-                                       done_all
-                                   </a> 
-                                   {% else %}
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   {% endif %}
-                               </td>
-                               <td class="text-align">
-                                   <div class="form-check form-switch d-flex justify-content-between">
-                                       <input class="form-check-input"  type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
-                                   </div>
-                               </td>
-                           </tr>
-                           {% endfor %}
-                       </tbody>
-                   </table>
-       
-                   <h6 class="text-secondary">Pagos {{ pagos_pulman.0.fecha_pago }}: {{ pagos_pulman.0.empresa | upper}}</h6>
-                   <h6 class="text-secondary d-flex justify-content-between">
-                       <span class="text-success">$ {{ total_pulman| intcomma}} </span>
-                       <span class="text-danger"> $ {{total_rechazados_pulman | intcomma}}</span></h6>
-                   <hr>
-                   <table class="container-fluid table table-sm">
-                       <thead class="table-dark">
-                           <tr>
-                               <th>emision</th>
-                               <th class="no-movil">vencimiento</th>
-                               <th class="">proveedor</th>
-                               <th>descripcion</th>
-                               <th class="no-movil">concepto</th>
-                               <th>descuento</th>
-                               <th>valor</th>
-                               <th> Accion</th>
-                               <th>Seleccion</th>
-                           </tr>
-                       </thead>
-                       <tbody class="table table-sm">
-                           {% for pago in pagos_pulman %}
-                           <tr class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
-                               <td>{{ pago.emision }}
-                                   <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.vencimiento }}</td>
-                               <td>{{ pago.nit }} {{ pago.proveedor }}</td>
-                               <td>{{ pago.descripcion }} 
-                                   <span class="movil">- Concepto: {{ pago.concepto }}</span>
-                               </td>
-                               <td class="no-movil">{{ pago.concepto }}
-                               </td>
-                               <td>{{ pago.descuento }}</td>
-                               <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                               <td>
-                                   {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
-                                   <a href="{% url 'aprobar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 done"  id="done">
-                                           check_circle
-                                           </span>
-                                   </a>
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1 cancel" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   
-                                   {% elif pago.estado == '9' %}
-                                   <a  class="material-symbols-outlined done_all" id="done_all"  
-                                   href="{% url 'aprobar' pago.id %}">
-                                       done_all
-                                   </a> 
-                                   {% else %}
-                                   <a href="{% url 'rechazar' pago.id %}">
-                                       <span class="material-symbols-outlined p-1" id="cancel">
-                                           cancel
-                                       </span>
-                                   </a>
-                                   {% endif %}
-                               </td>
-                               <td class="text-align">
-                                   <div class="form-check form-switch d-flex justify-content-between">
-                                       <input class="form-check-input"  type="checkbox" value="{{pago.id}}" id="check" role="switch" name="check">
-                                   </div>
-                               </td>
-                           </tr>
-                           {% endfor %}
-                       </tbody>
-                   </table>
-                   <hr>
-           </div>
-           <hr>
+
+            {% if total_nomina > 0 %}
+            <h6 class="text-secondary">Pagos {{ pagos_nomina.0.fecha_pago }}: {{ pagos_nomina.0.empresa | upper}}</h6>
+            <h6 class="text-secondary">$ {{ total_nomina| intcomma}}</h6>
+
+            <hr>
+            <table class="table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>emision</th>
+                        <th class="no-movil">vencimiento</th>
+                        <th class="no-">proveedor</th>
+                        <th>descripcion</th>
+                        <th class="no-movil">concepto</th>
+                        <th>descuento</th>
+                        <th>valor</th>
+                        <th>Accion</th>
+                        <th>Seleccion</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-sm">
+                    {% for pago in pagos_nomina %}
+                    <tr
+                        class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} {{ pago.proveedor }}</td>
+                        <td>{{ pago.descripcion }}
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 done" id="done">
+                                    check_circle
+                                </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 cancel" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+                            <input type="checkbox" class="form-check-input">
+                            {% elif pago.estado == '9' %}
+                            <a class="material-symbols-outlined done_all" id="done_all"
+                                href="{% url 'aprobar' pago.id %}">
+                                done_all
+                            </a>
+                            {% else %}
+                            {{pago.get_estado_display}}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="form-check form-switch d-flex justify-content-between">
+                                <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check"
+                                    role="switch" name="check">
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            <h6 class="text-secondary">Pagos {{ pagos.0.fecha_pago }}: {{ pagos.0.empresa | upper}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary" title="Total">$ {{ total | intcomma}}</span>
+                <span class="text-success" title="Aprobado">$ {{ total_pagos_ok| intcomma}}</span>
+                <span class="text-danger" title="Rechazado"> $ {{total_rechazados | intcomma}}</span>
+            </h6>
+            <hr>
+            <table class="table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>emision</th>
+                        <th class="no-movil">vencimiento</th>
+                        <th class="">proveedor</th>
+                        <th>descripcion</th>
+                        <th class="no-movil">concepto</th>
+                        <th>descuento</th>
+                        <th>valor</th>
+                        <th> Accion</th>
+                        <th>Seleccion</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-sm">
+                    {% for pago in pagos %}
+                    <tr
+                        class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} {{ pago.proveedor }}</td>
+                        <td>{{ pago.descripcion }}
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 done" id="done">
+                                    check_circle
+                                </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 cancel" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+
+                            {% elif pago.estado == '9' %}
+                            <a class="material-symbols-outlined done_all" id="done_all"
+                                href="{% url 'aprobar' pago.id %}">
+                                done_all
+                            </a>
+                            {% else %}
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-align">
+                            <div class="form-check form-switch d-flex justify-content-between">
+                                <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check"
+                                    role="switch" name="check">
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <hr>
+
+            <h6 class="text-secondary">Pagos {{ pagos_dyjon.0.fecha_pago }}: {{ pagos_dyjon.0.empresa | upper}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary">$ {{ total_dyjon|add:total_rechazados_dyjon | intcomma}}</span>
+                <span class="text-success">$ {{ total_dyjon| intcomma}}</span>
+                <span class="text-danger"> $ {{total_rechazados_dyjon | intcomma}}</span>
+            </h6>
+            <hr>
+            <table class="container-fluid table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>emision</th>
+                        <th class="no-movil">vencimiento</th>
+                        <th class="">proveedor</th>
+                        <th>descripcion</th>
+                        <th class="no-movil">concepto</th>
+                        <th>descuento</th>
+                        <th>valor</th>
+                        <th> Accion</th>
+                        <th>Seleccion</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-sm">
+                    {% for pago in pagos_dyjon %}
+                    <tr
+                        class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} {{ pago.proveedor }}</td>
+                        <td>{{ pago.descripcion }}
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 done" id="done">
+                                    check_circle
+                                </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 cancel" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+
+                            {% elif pago.estado == '9' %}
+                            <a class="material-symbols-outlined done_all" id="done_all"
+                                href="{% url 'aprobar' pago.id %}">
+                                done_all
+                            </a>
+                            {% else %}
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-align">
+                            <div class="form-check form-switch d-flex justify-content-between">
+                                <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check"
+                                    role="switch" name="check">
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h6 class="text-secondary">Pagos {{ pagos_pulman.0.fecha_pago }}: {{ pagos_pulman.0.empresa | upper}}</h6>
+            <h6 class="text-secondary d-flex justify-content-between">
+                <span class="text-primary">$ {{ total_pulman|add:total_rechazados_pulman | intcomma}}</span>
+                <span class="text-success">$ {{ total_pulman| intcomma}} </span>
+                <span class="text-danger"> $ {{total_rechazados_pulman | intcomma}}</span>
+            </h6>
+            <hr>
+            <table class="container-fluid table table-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>emision</th>
+                        <th class="no-movil">vencimiento</th>
+                        <th class="">proveedor</th>
+                        <th>descripcion</th>
+                        <th class="no-movil">concepto</th>
+                        <th>descuento</th>
+                        <th>valor</th>
+                        <th> Accion</th>
+                        <th>Seleccion</th>
+                    </tr>
+                </thead>
+                <tbody class="table table-sm">
+                    {% for pago in pagos_pulman %}
+                    <tr
+                        class="{% if pago.estado == '0' %} table-danger {% elif pago.estado == '9' %} table-warning {%else %} table-light {%endif%}">
+                        <td>{{ pago.emision }}
+                            <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.vencimiento }}</td>
+                        <td>{{ pago.nit }} {{ pago.proveedor }}</td>
+                        <td>{{ pago.descripcion }}
+                            <span class="movil">- Concepto: {{ pago.concepto }}</span>
+                        </td>
+                        <td class="no-movil">{{ pago.concepto }}
+                        </td>
+                        <td>{{ pago.descuento }}</td>
+                        <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
+                        <td>
+                            {% if pago.estado == '0' and pago.empresa != 'pendientes'%}
+                            <a href="{% url 'aprobar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 done" id="done">
+                                    check_circle
+                                </span>
+                            </a>
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1 cancel" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+
+                            {% elif pago.estado == '9' %}
+                            <a class="material-symbols-outlined done_all" id="done_all"
+                                href="{% url 'aprobar' pago.id %}">
+                                done_all
+                            </a>
+                            {% else %}
+                            <a href="{% url 'rechazar' pago.id %}">
+                                <span class="material-symbols-outlined p-1" id="cancel">
+                                    cancel
+                                </span>
+                            </a>
+                            {% endif %}
+                        </td>
+                        <td class="text-align">
+                            <div class="form-check form-switch d-flex justify-content-between">
+                                <input class="form-check-input" type="checkbox" value="{{pago.id}}" id="check"
+                                    role="switch" name="check">
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <hr>
+        </div>
+        <hr>
         <div class="mb-5">
         </div>
         <div class="mt-5 fixed-bottom ">
             <div class="d-flex justify-content-between" style="background-color: #212529; padding: 5px;">
-                <button class="btn btn-sm btn-danger p-2" id="boton" value="rechazar" type="submit" name="boton">Rechazar Selección</button>
-                <button class="btn btn-sm btn-success p-2" id="boton" value="aprobar" type="submit" name="boton">Aprobar Selección</button> 
+                <button class="btn btn-sm btn-danger p-2" id="boton" value="rechazar" type="submit"
+                    name="boton">Rechazar Selección</button>
+                <button class="btn btn-sm btn-success p-2" id="boton" value="aprobar" type="submit" name="boton">Aprobar
+                    Selección</button>
             </div>
         </div>
-    </div>
-    </form>
+</div>
+</form>
 </div>
 
 {% endblock %}
