@@ -728,6 +728,9 @@ def pendientes_acuerdo(request):
             return render(request, "pendientes_acuerdo.html", {"acuerdos": acuerdos})
 
         print(ultimo_dia_acuerdos.dia)
+        if ultimo_dia_acuerdos.dia == dia:
+            ultimo_dia_acuerdos.dia = dia + 1
+
         Acuerdos.objects.filter(año=año, mes=mes, dia=dia, estado="0").update(
             dia=ultimo_dia_acuerdos.dia
         )
