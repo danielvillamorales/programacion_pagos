@@ -2,35 +2,98 @@
 {% block content %}
 {% load humanize %}
 
-<div class="container-fluid">
-    <div class="row p-1">
+<div class="modern-container">
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">calendar_month</span>
+            Programación de Pagos
+        </h2>
+        <p class="dashboard-subtitle">Arrastra los acuerdos para programar los pagos del día</p>
+    </div>
 
-        <div class="col-6">
-            <h6 class="text-danger text-center" >Pendientes <span id="total-pnd"
-                class="float-right mt-2 text-danger text-end">: $0</span></h6>
-            <hr>
-            <ul class="list-group border border-secondary p-1" id="div1" ondrop="drop(event)"
-                ondragover="allowDrop(event)" style="min-height: 100px; max-height: 35em; overflow-y: auto;">
-                {% for acuerdo in acuerdos %}
-                <li draggable="true" ondragstart="drag(event)" id="drag{{acuerdo.id}}" height="31"
-                    class="list-group-item list-group-item-action list-group-item-light m-1" value="{{acuerdo.id}}">
-                  Día {{acuerdo.dia}} - {{acuerdo.proovedoor}}: {{acuerdo.cuota | intcomma}}</li>
-                {% endfor %}
-            </ul>
+    <div class="cards-container">
+        <!-- Columna Pendientes -->
+        <div class="payment-card pending-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="material-symbols-outlined text-warning">schedule</span>
+                    <span>Pendientes</span>
+                </div>
+                <div class="card-total" id="total-pnd">
+                    $0
+                </div>
+            </div>
+
+            <div class="card-content">
+                <!-- Buscador -->
+                <div class="search-container">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="text" class="search-input" id="search-pending"
+                        placeholder="Buscar por proveedor o día...">
+                    <button class="search-clear" id="clear-search" style="display: none;">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="drop-zone" id="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <div class="drop-zone-placeholder" id="pending-placeholder">
+                        <span class="material-symbols-outlined">inbox</span>
+                        <p>Arrastra acuerdos aquí</p>
+                    </div>
+                    {% for acuerdo in acuerdos %}
+                    <div class="agreement-item" draggable="true" ondragstart="drag(event)" id="drag{{acuerdo.id}}"
+                        value="{{acuerdo.id}}" data-provider="{{acuerdo.proovedoor|lower}}" data-day="{{acuerdo.dia}}">
+                        <div class="agreement-info">
+                            <div class="agreement-day">
+                                <span class="material-symbols-outlined">calendar_today</span>
+                                Día {{acuerdo.dia}}
+                            </div>
+                            <div class="agreement-provider">{{acuerdo.proovedoor}}</div>
+                        </div>
+                        <div class="agreement-amount">
+                            ${{acuerdo.cuota|floatformat:2}}
+                        </div>
+                        <div class="drag-handle">
+                            <span class="material-symbols-outlined">drag_indicator</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
 
-        <div class="col-6">
-            <h6 class="text-success text-center">Pagos Hoy <span id="total-value"
-                    class="float-right mt-2 text-success text-end">: $0</span></h6>
-            <hr>
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="selected_items" id="selected-items-input" value="">
-                <ul class="list-group border border-secondary p-1" id="div2" ondrop="drop(event)"
-                    ondragover="allowDrop(event)" style="min-height: 100px;">
-                </ul>
-                <button class="btn btn-outline-secondary btn-sm mt-1" type="submit">Guardar</button>
-            </form>
+        <!-- Columna Pagos Hoy -->
+        <div class="payment-card today-card">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="material-symbols-outlined text-success">check_circle</span>
+                    <span>Pagos Hoy</span>
+                </div>
+                <div class="card-total" id="total-value">
+                    $0
+                </div>
+            </div>
+
+            <div class="card-content">
+                <form method="post" class="payment-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="selected_items" id="selected-items-input" value="">
+
+                    <div class="drop-zone" id="div2" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="drop-zone-placeholder" id="today-placeholder">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            <p>Arrastra acuerdos aquí para programar</p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-save" type="submit">
+                            <span class="material-symbols-outlined">save</span>
+                            Guardar Programación
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -38,56 +101,174 @@
 <script>
     function allowDrop(ev) {
         ev.preventDefault();
+        ev.currentTarget.classList.add('drag-over');
     }
 
     function drag(ev) {
         ev.dataTransfer.setData("text", ev.target.id);
+        ev.target.classList.add('dragging');
     }
-
-    //function drop(ev) {
-    //    ev.preventDefault();
-    //    var data = ev.dataTransfer.getData("text");
-    //    ev.target.append(document.getElementById(data));
-    //}
 
     function drop(ev) {
         ev.preventDefault();
+        ev.currentTarget.classList.remove('drag-over');
+
         var data = ev.dataTransfer.getData("text");
-        ev.target.append(document.getElementById(data));
-        var total = 0;
-        var items = document.querySelectorAll('#div2 li');
-        var total = 0;
-        items.forEach(function (item) {
-            total += parseInt(item.textContent.split(':')[1].replace('.', '').replace('.', ''));
-            item.style.pointerEvents = 'none';
-        });
-        var formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        document.getElementById('total-value').textContent = ': $ ' + formattedTotal;
-        updateSelectedItemsInput();
-        total_pnd();
+        var draggedElement = document.getElementById(data);
+
+        if (draggedElement) {
+            draggedElement.classList.remove('dragging');
+            ev.currentTarget.appendChild(draggedElement);
+
+            // Ocultar placeholder si hay elementos
+            var placeholder = ev.currentTarget.querySelector('.drop-zone-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+
+            updateTotals();
+            updateSelectedItemsInput();
+        }
     }
 
-    function total_pnd(){
-        var items = document.querySelectorAll('#div1 li');
-        var total = 0;
-        items.forEach(function (item) {
-            total += parseInt(item.textContent.split(':')[1].replace('.', '').replace('.', ''));
+    function updateTotals() {
+        // Función para convertir texto de moneda a número
+        function parseCurrency(currencyText) {
+            // Remover el símbolo $ y espacios
+            var cleanText = currencyText.replace('$', '').trim();
+
+            // Si tiene coma como separador decimal (formato colombiano)
+            if (cleanText.includes(',') && cleanText.split(',').length === 2) {
+                var parts = cleanText.split(',');
+                var integerPart = parts[0].replace(/\./g, ''); // Remover puntos de miles
+                var decimalPart = parts[1];
+                return parseFloat(integerPart + '.' + decimalPart);
+            }
+
+            // Si tiene punto como separador decimal (formato americano)
+            if (cleanText.includes('.')) {
+                var parts = cleanText.split('.');
+                if (parts.length === 2 && parts[1].length <= 2) {
+                    var integerPart = parts[0].replace(/,/g, ''); // Remover comas de miles
+                    var decimalPart = parts[1];
+                    return parseFloat(integerPart + '.' + decimalPart);
+                }
+            }
+
+            // Si no tiene separador decimal, tratar como entero
+            return parseFloat(cleanText.replace(/,/g, ''));
+        }
+
+        // Actualizar total de pagos hoy
+        var todayItems = document.querySelectorAll('#div2 .agreement-item');
+        var todayTotal = 0;
+        todayItems.forEach(function (item) {
+            var amountText = item.querySelector('.agreement-amount').textContent;
+            var amount = parseCurrency(amountText);
+            todayTotal += amount;
+            item.style.pointerEvents = 'none';
         });
-        var formattedTotal = total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        document.getElementById('total-pnd').textContent = ': $ ' + formattedTotal;
+
+        var formattedTodayTotal = todayTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        document.getElementById('total-value').textContent = '$' + formattedTodayTotal;
+
+        // Actualizar total de pendientes (solo elementos visibles)
+        var pendingItems = document.querySelectorAll('#div1 .agreement-item:not(.hidden)');
+        var pendingTotal = 0;
+        pendingItems.forEach(function (item) {
+            var amountText = item.querySelector('.agreement-amount').textContent;
+            var amount = parseCurrency(amountText);
+            pendingTotal += amount;
+        });
+
+        var formattedPendingTotal = pendingTotal.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+        document.getElementById('total-pnd').textContent = '$' + formattedPendingTotal;
+
+        // Mostrar placeholder si no hay elementos en pagos hoy
+        var todayPlaceholder = document.getElementById('today-placeholder');
+        if (todayItems.length === 0 && todayPlaceholder) {
+            todayPlaceholder.style.display = 'flex';
+        }
     }
+
     function updateSelectedItemsInput() {
-        // Obtener elementos seleccionados y actualizar el campo oculto
-        var selectedItems = Array.from(document.querySelectorAll('#div2 li'))
+        var selectedItems = Array.from(document.querySelectorAll('#div2 .agreement-item'))
             .map(item => item.getAttribute('value'));
         document.getElementById('selected-items-input').value = selectedItems.join(',');
     }
 
-    const div1 = document.getElementById('div1');
-    const div2 = document.getElementById('div2');
-    total_pnd();
+    // Funcionalidad de búsqueda
+    function setupSearch() {
+        const searchInput = document.getElementById('search-pending');
+        const clearButton = document.getElementById('clear-search');
 
-    //div2.style.minHeight = div1.clientHeight + 'px';    
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.toLowerCase().trim();
+            const agreementItems = document.querySelectorAll('#div1 .agreement-item');
+
+            let visibleCount = 0;
+
+            agreementItems.forEach(function (item) {
+                const provider = item.getAttribute('data-provider') || '';
+                const day = item.getAttribute('data-day') || '';
+                const searchText = provider + ' ' + day;
+
+                if (searchTerm === '' || searchText.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Mostrar/ocultar botón de limpiar
+            if (searchTerm.length > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
+
+            // Actualizar placeholder si no hay resultados
+            const placeholder = document.getElementById('pending-placeholder');
+            if (visibleCount === 0 && searchTerm.length > 0) {
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = '<span class="material-symbols-outlined">search_off</span><p>No se encontraron resultados</p>';
+            } else if (visibleCount > 0) {
+                placeholder.style.display = 'none';
+            } else {
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = '<span class="material-symbols-outlined">inbox</span><p>Arrastra acuerdos aquí</p>';
+            }
+
+            updateTotals();
+        });
+
+        clearButton.addEventListener('click', function () {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+            searchInput.focus();
+        });
+    }
+
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', function () {
+        updateTotals();
+        setupSearch();
+
+        // Agregar eventos de drag end para limpiar clases
+        document.addEventListener('dragend', function (e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        });
+    });
 </script>
 
 

@@ -1,48 +1,181 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load humanize %}
-<div class="col-12">
-    <div class="p-2">
+
+<div class="modern-container">
     {% if cuotas %}
-    <h6 class="text-secondary">Acuerdo de pago {{cuotas.0.nombre_dia}} {{cuotas.0.dia}}/{{cuotas.0.mes}}/{{cuotas.0.año}}</h6>
-    <a href="{% url 'totales_mes' anio=cuotas.0.año mes=cuotas.0.mes%}" class="btn btn-sm btn-primary">volver</a>
-    {% if cuotas.0.estado == '0'  %}
-    <a href="{% url 'aprobar_acuerdo' cuotas.0.id %}" class="btn btn-success btn-sm">Aprobar</a>
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">receipt_long</span>
+            Detalle de Acuerdo
+        </h2>
+        <p class="dashboard-subtitle">{{cuotas.0.nombre_dia}} {{cuotas.0.dia}}/{{cuotas.0.mes}}/{{cuotas.0.año}}</p>
+    </div>
+
+    <!-- Acciones Principales -->
+    <div class="action-buttons">
+        <a href="{% url 'totales_mes' anio=cuotas.0.año mes=cuotas.0.mes%}" class="btn-back">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Volver
+        </a>
+
+        {% if cuotas.0.estado == '0' %}
+        <a href="{% url 'aprobar_acuerdo' cuotas.0.id %}" class="btn-approve-all">
+            <span class="material-symbols-outlined">check_circle</span>
+            Aprobar Todo
+        </a>
+        {% else %}
+        <div class="status-approved">
+            <span class="material-symbols-outlined">verified</span>
+            Ya están aprobados
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Tabla de Detalles -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-detalle">
+                <thead>
+                    <tr>
+
+                        <th class="th-proveedor">Proveedor</th>
+                        <th class="th-valor">Valor</th>
+                        <th class="th-acciones">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuota in cuotas %}
+                    <tr class="{% if cuota.estado == '1' %}row-approved{% endif %}">
+
+                        <td class="td-proveedor">
+                            <div class="proveedor-info">
+                                <span class="proveedor-nombre">{{ cuota.proovedoor }}</span>
+                                <span class="proveedor-nit">{{cuota.nit}}</span>
+                            </div>
+                        </td>
+                        <td class="td-valor">
+                            <span class="valor-amount">${{ cuota.cuota | intcomma}}</span>
+                        </td>
+                        <td class="td-acciones">
+                            {% if cuota.estado == '0' %}
+                            <div class="action-buttons-row">
+                                <a href="{% url 'aprobar_unico' cuota.id %}" class="btn-action btn-approve"
+                                    title="Aprobar">
+                                    <span class="material-symbols-outlined">check</span>
+                                </a>
+                                <a href="{% url 'rechazar_acuerdo' cuota.id %}" class="btn-action btn-reject"
+                                    title="Rechazar">
+                                    <span class="material-symbols-outlined">cancel</span>
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="status-indicator approved">
+                                <span class="material-symbols-outlined">verified</span>
+                                <span class="status-text">Aprobado</span>
+                            </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Resumen de Totales -->
+    <div class="summary-footer">
+        <div class="summary-item">
+            <span class="summary-label">Total Acuerdos:</span>
+            <span class="summary-value">{{ cuotas|length }}</span>
+        </div>
+    </div>
+
     {% else %}
-       <button class="btn btn-sm btn-info">ya estan aprobados</button> 
-    {% endif %}
-    {% endif %}
+    <!-- Estado Vacío -->
+    <div class="empty-state">
+        <span class="material-symbols-outlined">inbox</span>
+        <h3>No hay acuerdos</h3>
+        <p>No se encontraron acuerdos para esta fecha</p>
     </div>
-    <div class="container-fluid">
-           
-    <table class="table">
-        <thead class="table-dark">
-            <tr>
-                <th>dia</th>
-                <th>proveedor</th>
-                <th>valor</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cuota in cuotas %}
-            <tr>
-                <td>{{cuota.dia}}: {{ cuota.nombre_dia }}</td>
-                <td>{{cuota.nit}} {{ cuota.proovedoor }}</td>
-                <td>{{ cuota.cuota | intcomma}} </td>
-                <td>
-                    {% if cuota.estado == '0' %}
-                    <a class="btn btn-sm btn-success material-symbols-outlined" style="cursor:pointer;" href="{% url 'aprobar_unico' cuota.id %}" >
-                    check
-                    </a>
-                    <a class="btn btn-sm btn-danger material-symbols-outlined" style="cursor:pointer;" href="{% url 'rechazar_acuerdo' cuota.id %}" >
-                        cancel
-                    </a>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </div>
+    {% endif %}
 </div>
+
 {% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Calcular total de valores
+        function calculateTotalValues() {
+            console.log('=== INICIANDO CÁLCULO DE TOTALES ===');
+
+            // Buscar elementos de diferentes formas
+            const valorElements1 = document.querySelectorAll('.valor-amount');
+            const valorElements2 = document.querySelectorAll('span[class*="valor"]');
+            const valorElements3 = document.querySelectorAll('td[class*="valor"]');
+
+            console.log('Elementos .valor-amount encontrados:', valorElements1.length);
+            console.log('Elementos span[class*="valor"] encontrados:', valorElements2.length);
+            console.log('Elementos td[class*="valor"] encontrados:', valorElements3.length);
+
+            // Usar el primer conjunto que tenga elementos
+            let valorElements = valorElements1;
+            if (valorElements1.length === 0 && valorElements2.length > 0) {
+                valorElements = valorElements2;
+            } else if (valorElements1.length === 0 && valorElements2.length === 0 && valorElements3.length > 0) {
+                valorElements = valorElements3;
+            }
+
+            let total = 0;
+            console.log('Usando', valorElements.length, 'elementos para el cálculo');
+
+            valorElements.forEach(function (element, index) {
+                // Extraer el valor numérico del texto (remover $ y comas)
+                const text = element.textContent.trim();
+                console.log('Elemento', index, ':', text);
+
+                // Limpiar el texto removiendo símbolos de moneda y separadores
+                let cleanText = text.replace(/[$]/g, '').replace(/,/g, '').replace(/\./g, '');
+
+                // Si el número tiene puntos como separadores de miles, los removemos
+                // y si tiene comas como decimales, las convertimos a puntos
+                if (cleanText.includes(',')) {
+                    const parts = cleanText.split(',');
+                    if (parts.length === 2 && parts[1].length <= 2) {
+                        // Es un decimal con coma
+                        cleanText = parts[0] + '.' + parts[1];
+                    } else {
+                        // Son separadores de miles, los removemos
+                        cleanText = cleanText.replace(/,/g, '');
+                    }
+                }
+
+                const value = parseFloat(cleanText) || 0;
+                console.log('Texto limpio:', cleanText);
+                console.log('Valor extraído:', value);
+                total += value;
+            });
+
+            console.log('Total calculado:', total);
+
+            // Formatear el total con comas
+            const formattedTotal = total.toLocaleString('es-CO');
+            const totalElement = document.getElementById('total-valores');
+
+            if (totalElement) {
+                totalElement.textContent = '$' + formattedTotal;
+                console.log('Total actualizado en DOM:', '$' + formattedTotal);
+            } else {
+                console.error('Elemento total-valores no encontrado');
+            }
+
+            console.log('=== FIN DEL CÁLCULO ===');
+        }
+
+        // Ejecutar el cálculo con múltiples intentos
+        setTimeout(calculateTotalValues, 100);
+        setTimeout(calculateTotalValues, 500);
+        setTimeout(calculateTotalValues, 1000);
+    });
+</script>

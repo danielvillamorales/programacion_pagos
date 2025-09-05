@@ -627,16 +627,21 @@ def totales_mes(request, anio, mes):
 
 def get_dia_semana(año, mes, dia):
     fecha = date(año, mes, dia)
-    # Establecer la configuración regional a español
-    locale.setlocale(locale.LC_TIME, "es_ES")
 
-    # Obtener el nombre del día de la semana en español
-    nombre_dia = fecha.strftime("%A")
-    nombre_dia = nombre_dia.upper()
-    # print(nombre_dia)
+    # Mapeo de días de la semana en español
+    dias_semana = {
+        0: "LUNES",
+        1: "MARTES",
+        2: "MIÉRCOLES",
+        3: "JUEVES",
+        4: "VIERNES",
+        5: "SÁBADO",
+        6: "DOMINGO",
+    }
 
-    # Restablecer la configuración regional a la predeterminada
-    locale.setlocale(locale.LC_TIME, "")
+    # Obtener el número del día de la semana (0=lunes, 6=domingo)
+    numero_dia = fecha.weekday()
+    nombre_dia = dias_semana[numero_dia]
 
     return nombre_dia
 

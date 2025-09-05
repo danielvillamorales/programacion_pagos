@@ -1,43 +1,171 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load humanize %}
-<div class="col-12 container-fluid">
-    <div class="p-2">
-    <h6 class="text-primary">Acuerdo de pago {{cuotas.0.año}} - {{cuotas.0.mes}}</h6>
-    <h6 class="text-secondary d-flex justify-content-between">
-        <span class="text-danger" title="Total">Pendiente $ {{ total_pendientes.total | intcomma}}</span>
-        <span class="text-primary" title="Total">Pagado $ {{ total_aprobados.total | intcomma}}</span>
-    </h6>
+
+<div class="modern-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">calendar_view_month</span>
+            Acuerdo de Pago {{cuotas.0.año}} - {{cuotas.0.mes_nombre}}
+        </h2>
+        <p class="dashboard-subtitle">Distribución mensual de cuotas y pagos</p>
     </div>
 
-<div class="mt-2">
-    <table class="table table-sm table-striped">
-        <thead>
-            <tr>
-                <th>Año</th>
-                <th>Mes</th>
-                <th>Dia</th>
-                <th>Pagado</th>
-                <th>Pendiente</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cuota in cuotas %}
-            <tr>
-                <td>{{cuota.año}}</td>
-                <td>{{cuota.mes_nombre}}</td>
-                <td>{{cuota.dia_nombre}} : {{cuota.dia}}</td>
-                <td>{{cuota.pagado | intcomma}}</td>
-                <td>{{cuota.pendiente | intcomma}}</td>
-                <td>
-                    <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}" class="btn btn-primary btn-sm">
-                       VER
-                </td>
-            </tr>
-            {% endfor%}
-        </tbody>
-    </table>
+    <!-- Resumen de Totales -->
+    <div class="summary-cards">
+        <div class="summary-card pending-summary">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">Pendiente</h3>
+                <p class="summary-amount">${{ total_pendientes.total | intcomma }}</p>
+            </div>
+        </div>
+
+        <div class="summary-card paid-summary">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">Pagado</h3>
+                <p class="summary-amount">${{ total_aprobados.total | intcomma }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vista de Tabla para Desktop -->
+    <div class="desktop-table-container desktop-view">
+        <div class="table-responsive">
+            <table class="table table-totales-mes">
+                <thead>
+                    <tr>
+                        <th class="th-dia">Día</th>
+                        <th class="th-pagado">Pagado</th>
+                        <th class="th-pendiente">Pendiente</th>
+                        <th class="th-progreso">Progreso</th>
+                        <th class="th-estado">Estado</th>
+                        <th class="th-accion">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuota in cuotas %}
+                    <tr class="{% if cuota.pendiente == 0 %}row-paid{% endif %}">
+                        <td class="td-dia">
+                            <div class="dia-info-desktop">
+                                <span class="dia-numero-desktop">{{cuota.dia}}</span>
+                                <span class="dia-nombre-desktop">{{cuota.dia_nombre}}</span>
+                            </div>
+                        </td>
+                        <td class="td-pagado">
+                            <span class="amount-paid">${{cuota.pagado | intcomma}}</span>
+                        </td>
+                        <td class="td-pendiente">
+                            <span class="amount-pending">${{cuota.pendiente | intcomma}}</span>
+                        </td>
+                        <td class="td-progreso">
+                            {% if cuota.pagado > 0 or cuota.pendiente > 0 %}
+                            <div class="progress-container-desktop">
+                                <div class="progress-bar-desktop">
+                                    {% if cuota.pagado > 0 and cuota.pendiente > 0 %}
+                                    <div class="progress-fill-desktop" style="width: 50%"></div>
+                                    {% elif cuota.pagado > 0 %}
+                                    <div class="progress-fill-desktop" style="width: 100%"></div>
+                                    {% else %}
+                                    <div class="progress-fill-desktop" style="width: 0%"></div>
+                                    {% endif %}
+                                </div>
+                                <span class="progress-text-desktop">
+                                    {% if cuota.pagado > 0 and cuota.pendiente > 0 %}
+                                    50%
+                                    {% elif cuota.pagado > 0 %}
+                                    100%
+                                    {% else %}
+                                    0%
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% else %}
+                            <span class="no-progress">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="td-estado">
+                            {% if cuota.pendiente > 0 %}
+                            <span class="status-badge-desktop pending">Pendiente</span>
+                            {% else %}
+                            <span class="status-badge-desktop paid">Pagado</span>
+                            {% endif %}
+                        </td>
+                        <td class="td-accion">
+                            <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}"
+                                class="btn-action-desktop" title="Ver Detalles">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Vista de Tabla para Móviles -->
+    <div class="mobile-table-container mobile-view">
+        <div class="table-responsive">
+            <table class="table table-modern">
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Pagado</th>
+                        <th>Pendiente</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuota in cuotas %}
+                    <tr>
+                        <td class="dia-cell">
+                            <div class="dia-info-mobile">
+                                <span class="dia-numero-mobile">{{cuota.dia}}</span>
+                                <span class="dia-nombre-mobile">{{cuota.dia_nombre}}</span>
+                            </div>
+                        </td>
+                        <td class="amount-cell paid">
+                            ${{cuota.pagado | intcomma}}
+                        </td>
+                        <td class="amount-cell pending">
+                            ${{cuota.pendiente | intcomma}}
+                        </td>
+                        <td class="status-cell">
+                            {% if cuota.pendiente > 0 %}
+                            <span class="status-badge-mobile pending">Pendiente</span>
+                            {% else %}
+                            <span class="status-badge-mobile paid">Pagado</span>
+                            {% endif %}
+                        </td>
+                        <td class="action-cell">
+                            <a href="{% url 'detalle_acuerdo' anio=cuota.año mes=cuota.mes dia=cuota.dia%}"
+                                class="btn-action-mobile">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mensaje si no hay cuotas -->
+    {% if not cuotas %}
+    <div class="empty-state">
+        <span class="material-symbols-outlined">inbox</span>
+        <h3>No hay cuotas para este mes</h3>
+        <p>No se encontraron acuerdos para el período seleccionado</p>
+    </div>
+    {% endif %}
 </div>
-</div>
+
 {% endblock %}

@@ -1,45 +1,111 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load humanize %}
-<div class="col-12">
-    <h3 class="text-secondary">Cuentas Bancarias Proveedor</h3>
-    <hr>
-    <div class="container-fluid">
-        <a href="{% url 'agregar_cuenta'%}" class="btn btn-primary btn-sm" title="Agregar Cuenta">+</a>
-        <form method="post">
-        {% csrf_token %}
-        <div class="input-group input-group-sm mb-3 mt-2">
-            <input type="text" class="form-control" name="buscar" id="buscar" placeholder="Busqueda Por nit o nombre">
-            <button class="btn btn-sm btn-primary" type="submit">Buscar</button>
-          </div>
-        </form>
-        <table class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>Nit</th>
-                    <th>Proveedor</th>
-                    <th>Banco</th>
-                    <th>Tipo de cuenta</th>
-                    <th>Numero de cuenta</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cuenta in cuentas %}
-                <tr>
-                    <td>{{ cuenta.nit }} - {{cuenta.digito_verificacion}}</td>
-                    <td>{{ cuenta.proveedor }}</td>
-                    <td>{{ cuenta.banco }}</td>
-                    <td>{{ cuenta.get_tipo_cuenta_display}}</td>
-                    <td>{{ cuenta.numero_cuenta }}</td>
-                    <td>{{ cuenta.get_estado_display }}</td>
-                    <td>
-                        <a href="{% url 'inactivar_cuenta' cuenta.id %}" class="btn btn-danger btn-sm" title="Inactivar cuenta">-</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+
+<div class="modern-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">account_balance</span>
+            Cuentas Bancarias
+        </h2>
+        <p class="dashboard-subtitle">Gestión de cuentas bancarias de proveedores</p>
     </div>
+
+    <!-- Acciones Principales -->
+    <div class="action-buttons">
+        <a href="{% url 'agregar_cuenta'%}" class="btn-add-account">
+            <span class="material-symbols-outlined">add</span>
+            Agregar Cuenta
+        </a>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-section">
+        <form method="post" class="search-form">
+            {% csrf_token %}
+            <div class="search-container">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input type="text" class="search-input" name="buscar" id="buscar"
+                    placeholder="Buscar por NIT o nombre del proveedor...">
+                <button class="search-button" type="submit">
+                    <span class="material-symbols-outlined">search</span>
+                    Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Cuentas -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-cuentas">
+                <thead>
+                    <tr>
+                        <th class="th-nit">NIT</th>
+                        <th class="th-proveedor">Proveedor</th>
+                        <th class="th-banco">Banco</th>
+                        <th class="th-tipo">Tipo de Cuenta</th>
+                        <th class="th-numero">Número de Cuenta</th>
+                        <th class="th-estado">Estado</th>
+                        <th class="th-acciones">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cuenta in cuentas %}
+                    <tr class="{% if cuenta.estado == '0' %}row-inactive{% endif %}">
+                        <td class="td-nit">
+                            <div class="nit-info">
+                                <span class="nit-number">{{ cuenta.nit }}</span>
+                                <span class="nit-dv">-{{cuenta.digito_verificacion}}</span>
+                            </div>
+                        </td>
+                        <td class="td-proveedor">
+                            <span class="proveedor-name">{{ cuenta.proveedor }}</span>
+                        </td>
+                        <td class="td-banco">
+                            <span class="banco-name">{{ cuenta.banco }}</span>
+                        </td>
+                        <td class="td-tipo">
+                            <span class="tipo-cuenta">{{ cuenta.get_tipo_cuenta_display}}</span>
+                        </td>
+                        <td class="td-numero">
+                            <span class="numero-cuenta">{{ cuenta.numero_cuenta }}</span>
+                        </td>
+                        <td class="td-estado">
+                            {% if cuenta.estado == '0' %}
+                            <span class="status-badge-cuenta active">{{cuenta.get_estado_display}}</span>
+                            {% else %}
+                            <span class="status-badge-cuenta inactive">{{cuenta.get_estado_display}}</span>
+                            {% endif %}
+                        </td>
+                        <td class="td-acciones">
+                            {% if cuenta.estado == '0' %}
+                            <a href="{% url 'inactivar_cuenta' cuenta.id %}" class="btn-action-cuenta btn-inactivate"
+                                title="Inactivar cuenta">
+                                <span class="material-symbols-outlined">block</span>
+                            </a>
+                            {% else %}
+                            <span class="btn-action-cuenta btn-disabled" title="Cuenta inactiva">
+                                <span class="material-symbols-outlined">block</span>
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Mensaje si no hay cuentas -->
+    {% if not cuentas %}
+    <div class="empty-state">
+        <span class="material-symbols-outlined">account_balance_wallet</span>
+        <h3>No hay cuentas registradas</h3>
+        <p>No se encontraron cuentas bancarias para mostrar</p>
+    </div>
+    {% endif %}
+</div>
+
 {% endblock %}

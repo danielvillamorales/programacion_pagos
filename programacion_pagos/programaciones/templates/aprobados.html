@@ -2,84 +2,324 @@
 {% block content %}
 {% load humanize %}
 
-<div class="col-12">
-    <div class="container-fluid">
-        <div>
-            <form method="post">
-                {% csrf_token %}
-                <h4 class="text-secondary">Buscar Pagos Aprobados</h4>
-                <hr>
-                <div class="input-group mb-3">
-                    <span class="input-group-text" id="basic-addon1">Fecha Busqueda</span>
-                    <input type="date" class="form-control" name="ifecha" id="ifecha" placeholder="Fecha" required>
-                    <button class="btn btn-secondary" type="submit" value="buscador" name="tipo">
-                        <span class="material-symbols-outlined">
-                            search
-                            </span>
-                    </button>
-                </div>
-            </form>
+<div class="modern-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">check_circle</span>
+            Pagos Aprobados
+        </h2>
+        <p class="dashboard-subtitle">Consulta y gestión de pagos aprobados por fecha</p>
+    </div>
+
+    <!-- Búsqueda -->
+    <div class="search-section">
+        <form method="post" class="search-form">
+            {% csrf_token %}
+            <div class="search-container">
+                <span class="material-symbols-outlined search-icon">event</span>
+                <input type="date" class="search-input" name="ifecha" id="ifecha" required>
+                <button class="search-button" type="submit" value="buscador" name="tipo">
+                    <span class="material-symbols-outlined">search</span>
+                    Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resumen de Totales -->
+    <div class="summary-cards">
+        <div class="summary-card ka">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">business</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">KA</h3>
+                <p class="summary-amount">${{ total|floatformat:2|intcomma }}</p>
+            </div>
         </div>
-        <div class="">
-            <h6 class="text-secondary">Pagos Aprobados</h6>
-            <h6 class="text-secondary">
-                <span class="badge bg-primary">KA: {{ total | intcomma}}</span>
-                <span class="badge bg-primary">DYJON: {{total_dyjon | intcomma}}</span>
-                <span class="badge bg-primary">PULMAN: {{total_pulman | intcomma}}</span>
-                <span class="badge bg-primary">ACUERDO: {{total_acuerdo | intcomma}}</span>
-            </h6>
-            <hr>
-            <table class="table" aria-describedby="tabla de empresa">
+        <div class="summary-card dyjon">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">domain</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">DYJON</h3>
+                <p class="summary-amount">${{ total_dyjon|floatformat:2|intcomma }}</p>
+            </div>
+        </div>
+        <div class="summary-card pulman">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">store</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">PULMAN</h3>
+                <p class="summary-amount">${{ total_pulman|floatformat:2|intcomma }}</p>
+            </div>
+        </div>
+        <div class="summary-card acuerdo">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">handshake</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">ACUERDO</h3>
+                <p class="summary-amount">${{ total_acuerdo|floatformat:2|intcomma }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Pagos -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table table-pagos" aria-describedby="tabla de empresa">
                 <thead class="table-dark">
                     <tr>
-                        <th>empresa</th>
-                        <th>emision</th>
-                        <th>nit</th>
-                        <th class="no-movil">proveedor</th>
-                        <th>descripcion</th>
-                        <th>descuento</th>
-                        <th>valor</th>
-                        <th>Cuentas</th>
-                        <th>Accion</th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">business</span>
+                            Empresa
+                        </th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">event</span>
+                            Emisión
+                        </th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">badge</span>
+                            NIT
+                        </th>
+                        <th class="fw-semibold no-movil">
+                            <span class="material-symbols-outlined me-1">person</span>
+                            Proveedor
+                        </th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">description</span>
+                            Descripción
+                        </th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">percent</span>
+                            Descuento
+                        </th>
+                        <th class="fw-semibold text-end">
+                            <span class="material-symbols-outlined me-1">attach_money</span>
+                            Valor
+                        </th>
+                        <th class="fw-semibold">
+                            <span class="material-symbols-outlined me-1">account_balance</span>
+                            Cuentas
+                        </th>
+                        <th class="fw-semibold text-center">
+                            <span class="material-symbols-outlined me-1">settings</span>
+                            Acción
+                        </th>
                     </tr>
                 </thead>
-                <tbody class="table">
+                <tbody>
                     {% for pago in pagos %}
-                            <tr class="{% if pago.revision == 0 %} table-warning {% endif %}">
-                                <td> {{pago.empresa}}</td>
-                                <td>{{ pago.emision | date:"Y-m-d"}}
-                                    <span class="movil">Vencimiento: {{ pago.vencimiento }}</span>
-                                </td>
-                                <td>{{ pago.nit }} <span class="movil">{{ pago.proveedor }}</span></td>
-                                <td class="no-movil">{{ pago.proveedor }} </td>
-                                <td>{{ pago.descripcion }} 
-                                    ( Concepto: {{ pago.concepto }})</span>
-                                </td>
-                                </td>
-                                <td>{{ pago.descuento }}</td>
-                                <td style="text-align: end;">{{ pago.valor | intcomma }}</td>
-                                <td> 
-                                    {{pago.cuentas_concatenadas |safe}}
-                                </td>
-                                <td>
-                                    {% if pago.revision == 0 %}
-                                    <form method="post">
-                                        {% csrf_token %}
-                                        <button type="submit" title="revisado" value="{% if pago.empresa == 'acuerdo' %} acuerdo{{pago.id}} {% else %} {{pago.id}} {% endif %}" name="validar" class="material-symbols-outlined" style="color:white; background-color: rgb(4, 26, 112); border-radius: 5px;">
-                                            check_circle
-                                        </button>
-                                    </form>
-                                    {% else%}
-                                    Revisado
-                                    {% endif %}
-
-                                </td>
-                            </tr>
+                    <tr class="{% if pago.revision == 0 %} table-warning border-warning {% endif %} align-middle">
+                        <td>
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-3 py-2">
+                                {{ pago.empresa|upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold">{{ pago.emision|date:"Y-m-d" }}</span>
+                                <small class="text-muted movil">Vencimiento: {{ pago.vencimiento
+                                    }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold">{{ pago.nit }}</span>
+                                <small class="text-muted movil">{{ pago.proveedor }}</small>
+                            </div>
+                        </td>
+                        <td class="no-movil">
+                            <span class="text-dark">{{ pago.proveedor }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-column">
+                                <span class="fw-semibold">{{ pago.descripcion }}</span>
+                                <small class="text-muted">Concepto: {{ pago.concepto }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                {{ pago.descuento }}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <span class="fw-bold text-success fs-6">
+                                ${{ pago.valor|floatformat:2|intcomma }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="text-wrap" style="max-width: 200px;">
+                                {{ pago.cuentas_concatenadas|safe }}
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            {% if pago.revision == 0 %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" title="Marcar como revisado"
+                                    value="{% if pago.empresa == 'acuerdo' %}acuerdo{{pago.id}}{% else %}{{pago.id}}{% endif %}"
+                                    name="validar"
+                                    class="btn btn-success btn-sm d-flex align-items-center justify-content-center"
+                                    style="min-width: 40px; min-height: 40px;">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                </button>
+                            </form>
+                            {% else %}
+                            <span
+                                class="badge bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center"
+                                style="min-width: 40px; min-height: 40px;">
+                                <span class="material-symbols-outlined me-1">verified</span>
+                                Revisado
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>  
+    </div>
 </div>
+
+<style>
+    /* Estilos específicos para la página de pagos aprobados */
+
+    /* Cards de resumen con colores específicos */
+    .summary-card.ka {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .summary-card.dyjon {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+    }
+
+    .summary-card.pulman {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .summary-card.acuerdo {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .summary-card .summary-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+
+    .summary-card .summary-icon .material-symbols-outlined {
+        font-size: 2rem;
+        color: white;
+    }
+
+    .summary-card .summary-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 0.5rem 0;
+        color: white;
+    }
+
+    .summary-card .summary-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: white;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Tabla de pagos */
+    .table-pagos {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--card-bg);
+    }
+
+    .table-pagos th {
+        background: #1f2937;
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .table-pagos td {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+    }
+
+    .table-pagos tbody tr:hover {
+        background-color: rgba(59, 130, 246, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .table-pagos tbody tr.table-warning {
+        background-color: rgba(245, 158, 11, 0.1);
+        border-left: 4px solid #f59e0b;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .no-movil {
+            display: none !important;
+        }
+
+        .movil {
+            display: block !important;
+        }
+
+        .table-responsive {
+            font-size: 0.875rem;
+        }
+
+        .summary-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .summary-card {
+            padding: 1rem;
+        }
+
+        .summary-card .summary-icon {
+            width: 50px;
+            height: 50px;
+        }
+
+        .summary-card .summary-icon .material-symbols-outlined {
+            font-size: 1.5rem;
+        }
+
+        .summary-card .summary-title {
+            font-size: 1rem;
+        }
+
+        .summary-card .summary-amount {
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (min-width: 769px) {
+        .movil {
+            display: none !important;
+        }
+    }
+</style>
 
 {% endblock %}

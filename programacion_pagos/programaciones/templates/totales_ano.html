@@ -1,35 +1,135 @@
 {% extends "layout.html" %}
 {% block content %}
 {% load humanize %}
-<div class="col-12">
-    <div class="p-2">
-    <h6 class="text-secondary">Acuerdo de pago </h6>
-    <h6 class="text-secondary d-flex justify-content-between">
-        <span class="text-danger" title="Total">Pendiente $ {{ total_pendientes.total | intcomma}}</span>
-        <span class="text-primary" title="Total">Pagado $ {{ total_aprobados.total | intcomma}}</span>
-    </h6>
+
+<div class="modern-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <h2 class="dashboard-title">
+            <span class="material-symbols-outlined">analytics</span>
+            Acuerdos de Pago
+        </h2>
+        <p class="dashboard-subtitle">Resumen anual de cuotas y pagos pendientes</p>
     </div>
-</div>
-<div class="row mt-2">
-{% for cuota in cuotas %}
-{% if cuota.pendiente > 0 %}
-<div class="col-sm-3 col-6 mt-1">
-    <div class="card p-1" >
-        <div class="card-header">
-        {{cuota.año}} - {{cuota.mes_nombre}} Cuota # {{cuota.numero_de_cuota}}
+
+    <!-- Resumen de Totales -->
+    <div class="summary-cards">
+        <div class="summary-card pending-summary">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">Pendiente</h3>
+                <p class="summary-amount">${{ total_pendientes.total | intcomma }}</p>
+            </div>
         </div>
-        <div class="card-body">
-            <h6 class="card-title text-center text-primary">
-                Valor a Pagar: {{cuota.total | intcomma}}
-            </h6>
-            <h6 class="card-title text-center text-danger">
-                Pendiente: {{cuota.pendiente | intcomma}}
-            </h6>
-            <a href="{% url 'totales_mes' anio=cuota.año mes=cuota.mes %}" class="btn btn-sm btn-primary card-link text-center">Ver Ditribucion</a>
+
+        <div class="summary-card paid-summary">
+            <div class="summary-icon">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <div class="summary-content">
+                <h3 class="summary-title">Pagado</h3>
+                <p class="summary-amount">${{ total_aprobados.total | intcomma }}</p>
+            </div>
         </div>
     </div>
+
+    <!-- Grid de Cuotas -->
+    <div class="cuotas-grid">
+        {% for cuota in cuotas %}
+        {% if cuota.pendiente > 0 %}
+        <div class="cuota-card mt-4">
+            <div class="cuota-header bg-secondary">
+                <div class="cuota-period">
+                    <span class="material-symbols-outlined">calendar_month</span>
+                    <div class="period-info">
+                        <span class="year">{{cuota.año}}</span>
+                        <span class="month">{{cuota.mes_nombre}}</span>
+                    </div>
+                </div>
+                <div class="cuota-number">
+                    Cuota #{{cuota.numero_de_cuota}}
+                </div>
+            </div>
+
+            <div class="cuota-body">
+                <div class="amount-row">
+                    <div class="amount-item total-amount">
+                        <span class="amount-label">Valor a Pagar</span>
+                        <span class="amount-value">${{cuota.total | intcomma}}</span>
+                    </div>
+                    <div class="amount-item pending-amount">
+                        <span class="amount-label">Pendiente</span>
+                        <span class="amount-value">${{cuota.pendiente | intcomma}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cuota-footer">
+                <a href="{% url 'totales_mes' anio=cuota.año mes=cuota.mes %}" class="btn-view-distribution">
+                    <span class="material-symbols-outlined">visibility</span>
+                    Ver Distribución
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Mensaje si no hay cuotas -->
+    {% if not cuotas %}
+    <div class="empty-state">
+        <span class="material-symbols-outlined">inbox</span>
+        <h3>No hay cuotas pendientes</h3>
+        <p>Todos los acuerdos están al día</p>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
-{% endfor %}
-</div>
+
 {% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Calcular porcentajes de progreso para cada cuota
+        function calculateProgressPercentages() {
+            const progressFills = document.querySelectorAll('.progress-fill[data-total]');
+            const progressTexts = document.querySelectorAll('.progress-text[data-total]');
+
+            progressFills.forEach(function (fill, index) {
+                const total = parseFloat(fill.getAttribute('data-total')) || 0;
+                const pendiente = parseFloat(fill.getAttribute('data-pendiente')) || 0;
+
+                // Calcular lo que se ha pagado: total - pendiente
+                const pagado = total - pendiente;
+
+                // Calcular porcentaje: (pagado / total) * 100
+                let percentage = 0;
+                if (total > 0) {
+                    percentage = (pagado / total) * 100;
+                }
+
+                // Limitar el porcentaje entre 0 y 100
+                percentage = Math.max(0, Math.min(100, percentage));
+
+                // Actualizar la barra de progreso
+                fill.style.width = percentage + '%';
+
+                // Actualizar el texto del porcentaje
+                if (progressTexts[index]) {
+                    progressTexts[index].textContent = Math.round(percentage) + '% Pagado';
+                }
+
+                console.log('Cuota', index + 1, ':', {
+                    total: total,
+                    pendiente: pendiente,
+                    pagado: pagado,
+                    percentage: Math.round(percentage) + '%'
+                });
+            });
+        }
+
+        // Ejecutar el cálculo cuando se carga la página
+        calculateProgressPercentages();
+    });
+</script>
